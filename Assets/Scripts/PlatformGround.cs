@@ -57,11 +57,13 @@ public class PlatformGround : MonoBehaviour
         transform.rotation = Quaternion.Euler(_originalRotation.x + resultForce.y, _originalRotation.y, _originalRotation.z + resultForce.x);
     }
 
-    private int aboba;
+    private int _counter;
     void FixedUpdate()
     {
-        aboba += 1;
-        if (aboba % 30 != 0)
+        // Это костыль, чтобы можно было в едиторе менять массу и смотреть как меняется равновесие.
+        // Потом нужно заменить на что-то другое.
+        _counter += 1;
+        if (_counter % 30 != 0)
             return;
         
         CalcPlatformAngle();
