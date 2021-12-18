@@ -35,7 +35,6 @@ public class PlatformGround : MonoBehaviour
             var cargoPos = new Vector3(Radius * Mathf.Sin(angleRad), 0f, Radius * Mathf.Cos(angleRad));
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, angle, 0));
             cargo.transform.SetParent(cargosHolder.transform);
-            cargo.transform.localScale *= mass;
             var cargoScript = cargo.AddComponent<Cargo>();
             cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z));
             _cargos.Add(cargoScript);
