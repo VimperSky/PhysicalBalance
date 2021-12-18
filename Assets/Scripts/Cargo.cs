@@ -2,14 +2,19 @@
 
 public class Cargo: MonoBehaviour
 {
-    private float _degree;
-    private float _mass;
+    public float Degree { get; private set; }
 
-    public float Degree => _degree;
+    public float Mass { get; private set; }
+    
+    public Vector2 Position { get; private set; }
 
-    public void SetData(float degree, float mass)
+    public void SetData(float degree, float mass, Vector2 position)
     {
-        _degree = degree;
-        _mass = mass;
+        Degree = degree;
+        Mass = mass;
+        Position = position;
     }
+
+    public Vector2 Force => Position * Mass;
+
 }
