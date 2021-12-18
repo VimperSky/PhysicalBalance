@@ -2,19 +2,16 @@
 
 public class Cargo: MonoBehaviour
 {
-    public float Degree { get; private set; }
+    [SerializeField] private float mass;
 
-    public float Mass { get; private set; }
-    
-    public Vector2 Position { get; private set; }
+    [SerializeField] private Vector2 position;
 
-    public void SetData(float degree, float mass, Vector2 position)
+    public void SetData(float mass, Vector2 position)
     {
-        Degree = degree;
-        Mass = mass;
-        Position = position;
+        this.mass = mass;
+        this.position = position;
     }
 
-    public Vector2 Force => Position * Mass;
+    public Vector2 Force => position * mass;
 
 }

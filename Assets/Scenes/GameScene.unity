@@ -852,8 +852,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fdb3cf3de09e9e4da90c77d73cfac90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cargoAngles: 5a0000000e010000b4000000
-  cargoMasses: 050000000500000005000000
+  cargoAngles: 2d00000091000000fa000000
+  cargoMasses: 0f0000000500000005000000
   cargosHolder: {fileID: 40379859}
   cargoPrefab: {fileID: 3859062136920173984, guid: ee2bc16d9d68092479c05fc2a484a228, type: 3}
 --- !u!1001 &2108761813

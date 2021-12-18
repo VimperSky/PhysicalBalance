@@ -13,9 +13,12 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject cargoPrefab;
 
     private const float Radius = 4.5f;
-    private List<Cargo> _cargos = new();
+    private readonly List<Cargo> _cargos = new();
+
+    private Vector3 _originalRotation;
     void Start()
     {
+        _originalRotation = transform.rotation.eulerAngles;
         SpawnCargos();
         CalcPlatformAngle();
     }
@@ -32,8 +35,9 @@ public class PlatformGround : MonoBehaviour
             var cargoPos = new Vector3(Radius * Mathf.Sin(angleRad), 0f, Radius * Mathf.Cos(angleRad));
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, angle, 0));
             cargo.transform.SetParent(cargosHolder.transform);
+            cargo.transform.localScale *= mass;
             var cargoScript = cargo.AddComponent<Cargo>();
-            cargoScript.SetData(angle, mass, new Vector2(cargoPos.x, cargoPos.z));
+            cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z));
             _cargos.Add(cargoScript);
         }
     }
@@ -50,17 +54,16 @@ public class PlatformGround : MonoBehaviour
         //var signVector = new Vector2(Math.Sign(resultForce.x), Math.Sign(resultForce.y));
         //var force = new Vector2(Mathf.Sqrt(Mathf.Abs(resultForce.x)), Mathf.Sqrt(Mathf.Abs(resultForce.y))) * signVector;
         
-        var rotation = transform.rotation.eulerAngles;
-        var newRotation = Quaternion.Euler(rotation.x + resultForce.y, rotation.y, rotation.z + resultForce.x);
-        transform.rotation = newRotation;
-        Debug.Log("original force: " + resultForce);
-        Debug.Log("normalized force: " + resultForce);
-        Debug.Log("current rotation: " + rotation);
-        Debug.Log("new rotation: " + newRotation);
+        transform.rotation = Quaternion.Euler(_originalRotation.x + resultForce.y, _originalRotation.y, _originalRotation.z + resultForce.x);
     }
 
-    void Update()
+    private int aboba;
+    void FixedUpdate()
     {
+        aboba += 1;
+        if (aboba % 30 != 0)
+            return;
         
+        CalcPlatformAngle();
     }
 }
