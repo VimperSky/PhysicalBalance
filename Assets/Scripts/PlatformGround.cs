@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Random = UnityEngine.Random;
 
 public class PlatformGround : MonoBehaviour
 {
@@ -20,12 +21,23 @@ public class PlatformGround : MonoBehaviour
     private readonly List<Cargo> _cargos = new();
     private Vector3 _originalRotation;
 
-    private List<LineRenderer> _lines = new ();
+    [SerializeField] private Button randomizeBtn;
+    
     void Start()
     {
+        randomizeBtn.onClick.AddListener(OnRandomizeBtnClick);
+        
         _originalRotation = transform.rotation.eulerAngles;
         SpawnCargos();
         CalcPlatformAngle();
+    }
+
+    private void OnRandomizeBtnClick()
+    {
+        foreach (var cargo in _cargos)
+        {
+            cargo.SetMass(Random.Range(1, 3) * 5);
+        }
     }
 
     private void SpawnCargos()
@@ -41,9 +53,6 @@ public class PlatformGround : MonoBehaviour
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, angle, 0));
             cargo.transform.SetParent(cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
-
-            var textMassObj = cargo.transform.GetChild(0).GetChild(0).gameObject;
-            textMassObj.GetComponent<TextMeshProUGUI>().text = mass.ToString();
 
             DrawLine(cargoPos);
 

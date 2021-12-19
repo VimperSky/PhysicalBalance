@@ -1,4 +1,5 @@
 ﻿using System;
+using TMPro;
 using UnityEngine;
 
 public class Cargo: MonoBehaviour
@@ -15,9 +16,17 @@ public class Cargo: MonoBehaviour
 
     public void SetData(float mass, Vector2 position)
     {
-        this.mass = mass;
+        SetMass(mass);
+        
         this.position = position;
         transform.localScale = _originalScale * mass;
+    }
+
+    public void SetMass(float mass)
+    {
+        this.mass = mass;
+        
+        transform.GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = mass.ToString();
     }
 
     public Vector2 Force => position * mass;
