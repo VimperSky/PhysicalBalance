@@ -85,7 +85,6 @@ public class PlatformGround : MonoBehaviour
         currentLine.SetPosition(1, cargoPosition);
         Debug.Log(currentLine.name);
         Debug.Log(cargoPosition);
-        Debug.Log(cargoPosition);
     }
 
     private void CalcPlatformAngle()
