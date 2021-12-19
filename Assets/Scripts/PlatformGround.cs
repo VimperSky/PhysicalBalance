@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlatformGround : MonoBehaviour
 {
@@ -14,11 +16,15 @@ public class PlatformGround : MonoBehaviour
 
     private const float Radius = 4.5f;
     private readonly List<Cargo> _cargos = new();
+    public LineRenderer Line1;
+    public LineRenderer Line2;
+    public LineRenderer Line3;
 
     private Vector3 _originalRotation;
     void Start()
     {
         _originalRotation = transform.rotation.eulerAngles;
+        InitLines();
         SpawnCargos();
         CalcPlatformAngle();
     }
@@ -36,9 +42,50 @@ public class PlatformGround : MonoBehaviour
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, angle, 0));
             cargo.transform.SetParent(cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
+
+            GameObject textMassObj = cargo.transform.GetChild(0).GetChild(0).gameObject;
+            textMassObj.GetComponent<TextMeshProUGUI>().text = mass.ToString();
+
+            if (i == 0)
+            {
+                DrawLine(Line1, cargoPos);
+            }
+            else if (i == 1)
+            {
+                DrawLine(Line2, cargoPos);
+            }
+            else
+            {
+                DrawLine(Line3, cargoPos);
+            }    
+
             cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z));
             _cargos.Add(cargoScript);
         }
+    }
+
+    private void InitLines() 
+    {
+        Line1.startWidth = 0.05f;
+        Line1.endWidth = 0.05f;
+        Line1.positionCount = 2;
+
+        Line2.startWidth = 0.05f;
+        Line2.endWidth = 0.05f;
+        Line2.positionCount = 2;
+
+        Line3.startWidth = 0.05f;
+        Line3.endWidth = 0.05f;
+        Line3.positionCount = 2;
+    }
+
+    private void DrawLine(LineRenderer currentLine, Vector3 cargoPosition)
+    {
+        currentLine.SetPosition(0, new Vector3(0f, 0f, 0f));
+        currentLine.SetPosition(1, cargoPosition);
+        Debug.Log(currentLine.name);
+        Debug.Log(cargoPosition);
+        Debug.Log(cargoPosition);
     }
 
     private void CalcPlatformAngle()
