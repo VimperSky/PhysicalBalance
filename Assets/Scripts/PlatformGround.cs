@@ -13,18 +13,17 @@ public class PlatformGround : MonoBehaviour
     
     [SerializeField] private GameObject cargosHolder;
     [SerializeField] private GameObject cargoPrefab;
+    [SerializeField] private GameObject linesHolder;
+    [SerializeField] private GameObject linePrefab;
 
     private const float Radius = 4.5f;
     private readonly List<Cargo> _cargos = new();
-    public LineRenderer Line1;
-    public LineRenderer Line2;
-    public LineRenderer Line3;
-
     private Vector3 _originalRotation;
+
+    private List<LineRenderer> _lines = new ();
     void Start()
     {
         _originalRotation = transform.rotation.eulerAngles;
-        InitLines();
         SpawnCargos();
         CalcPlatformAngle();
     }
@@ -43,48 +42,26 @@ public class PlatformGround : MonoBehaviour
             cargo.transform.SetParent(cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
 
-            GameObject textMassObj = cargo.transform.GetChild(0).GetChild(0).gameObject;
+            var textMassObj = cargo.transform.GetChild(0).GetChild(0).gameObject;
             textMassObj.GetComponent<TextMeshProUGUI>().text = mass.ToString();
 
-            if (i == 0)
-            {
-                DrawLine(Line1, cargoPos);
-            }
-            else if (i == 1)
-            {
-                DrawLine(Line2, cargoPos);
-            }
-            else
-            {
-                DrawLine(Line3, cargoPos);
-            }    
+            DrawLine(cargoPos);
 
             cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z));
             _cargos.Add(cargoScript);
         }
     }
+    
 
-    private void InitLines() 
+    private void DrawLine(Vector3 cargoPosition)
     {
-        Line1.startWidth = 0.05f;
-        Line1.endWidth = 0.05f;
-        Line1.positionCount = 2;
-
-        Line2.startWidth = 0.05f;
-        Line2.endWidth = 0.05f;
-        Line2.positionCount = 2;
-
-        Line3.startWidth = 0.05f;
-        Line3.endWidth = 0.05f;
-        Line3.positionCount = 2;
-    }
-
-    private void DrawLine(LineRenderer currentLine, Vector3 cargoPosition)
-    {
-        currentLine.SetPosition(0, new Vector3(0f, 0f, 0f));
-        currentLine.SetPosition(1, cargoPosition);
-        Debug.Log(currentLine.name);
-        Debug.Log(cargoPosition);
+        var lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
+        lineObj.transform.SetParent(linesHolder.transform);
+        var lineRenderer = lineObj.GetComponent<LineRenderer>();
+        
+        lineRenderer.widthMultiplier = 0.2f;
+        lineRenderer.SetPosition(0, Vector3.zero);
+        lineRenderer.SetPosition(1, cargoPosition);
     }
 
     private void CalcPlatformAngle()
