@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using Random = UnityEngine.Random;
 
 public class PlatformGround : MonoBehaviour
@@ -23,24 +23,23 @@ public class PlatformGround : MonoBehaviour
     private const float CargoPlaceRadius = 4.5f;
     
     private readonly List<Cargo> _cargos = new();
+    
+    [SerializeField] private int unknownCargoId;
 
-    [SerializeField] private Button randomizeBtn;
+    [SerializeField] private GameObject winTextPrefab;
+    [SerializeField] private GameObject loseTextPrefab;
+
+    [SerializeField] private Transform canvasTransform;
+
+    private bool _gameIsStarted;
     
     void Start()
     {
-        randomizeBtn.onClick.AddListener(OnRandomizeBtnClick);
-        
         SpawnCargos();
         CalcPlatformAngle();
         DrawLines();
-    }
 
-    private void OnRandomizeBtnClick()
-    {
-        foreach (var cargo in _cargos)
-        {
-            cargo.SetMass(Random.Range(1, 3) * 5);
-        }
+        _gameIsStarted = true;
     }
 
     private void SpawnCargos()
@@ -56,7 +55,7 @@ public class PlatformGround : MonoBehaviour
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, angle, 0));
             cargo.transform.SetParent(cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
-            cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z), angleRad);
+            cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z), angleRad, i == unknownCargoId);
             _cargos.Add(cargoScript);
         }
     }
@@ -68,7 +67,7 @@ public class PlatformGround : MonoBehaviour
         lineObj.transform.SetParent(linesHolder.transform);
         var lineRenderer = lineObj.GetComponent<LineRenderer>();
         
-        lineRenderer.widthMultiplier = 0.2f;
+        lineRenderer.widthMultiplier = 0.1f;
         
         var startPos = new Vector3(RingRadius * Mathf.Sin(angleRad), 0f, RingRadius * Mathf.Cos(angleRad));
         startPos += ring.transform.position;
@@ -95,10 +94,20 @@ public class PlatformGround : MonoBehaviour
 
         resultForce /= 50f;
         ring.transform.position = new Vector3(resultForce.x, ring.transform.position.y, resultForce.y);
-        
+
+        if (!_gameIsStarted) 
+            return;
+        _gameIsStarted = false;
+
         if (resultForce == Vector2.zero)
         {
-            
+            // Победа
+            Instantiate(winTextPrefab, canvasTransform, false);
+        }
+        else
+        { 
+            // Поражение
+            Instantiate(loseTextPrefab, canvasTransform, false);
         }
     }
     
@@ -119,15 +128,14 @@ public class PlatformGround : MonoBehaviour
         }
     }
     
+    
 
-    private int _counter;
-    void FixedUpdate()
+    public void ChangeMass(int value)
     {
-        // Это костыль, чтобы можно было в едиторе менять массу и смотреть как меняется равновесие.
-        // Потом нужно заменить на что-то другое.
-        _counter += 1;
-        if (_counter % 30 != 0)
+        if (!_gameIsStarted)
             return;
+        
+        _cargos[unknownCargoId].SetMass(value, true);
         
         CalcPlatformAngle();
         DrawLines();
