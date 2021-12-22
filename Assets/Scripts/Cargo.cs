@@ -5,30 +5,32 @@ using UnityEngine;
 public class Cargo: MonoBehaviour
 {
     private Vector3 _originalScale;
-    [SerializeField] private float mass;
+    private float _mass;
 
-    [SerializeField] private Vector2 position;
+    public Vector2 Position { get; private set; }
+    public float AngleRad { get; private set; }
 
     private void Awake()
     {
         _originalScale = transform.localScale;
     }
 
-    public void SetData(float mass, Vector2 position)
+    public void SetData(float mass, Vector2 position, float angleRad)
     {
         SetMass(mass);
         
-        this.position = position;
+        Position = position;
+        AngleRad = angleRad;
         transform.localScale = _originalScale * mass;
     }
 
     public void SetMass(float mass)
     {
-        this.mass = mass;
+        _mass = mass;
         
         transform.GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = mass.ToString();
     }
 
-    public Vector2 Force => position * mass;
+    public Vector2 Force => Position * _mass;
 
 }

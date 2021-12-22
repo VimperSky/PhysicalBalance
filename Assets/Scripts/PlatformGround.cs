@@ -16,10 +16,13 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject cargoPrefab;
     [SerializeField] private GameObject linesHolder;
     [SerializeField] private GameObject linePrefab;
-
-    private const float Radius = 4.5f;
+    
+    [SerializeField] private GameObject ring;
+    
+    private const float RingRadius = 1.25f;
+    private const float CargoPlaceRadius = 4.5f;
+    
     private readonly List<Cargo> _cargos = new();
-    private Vector3 _originalRotation;
 
     [SerializeField] private Button randomizeBtn;
     
@@ -27,9 +30,9 @@ public class PlatformGround : MonoBehaviour
     {
         randomizeBtn.onClick.AddListener(OnRandomizeBtnClick);
         
-        _originalRotation = transform.rotation.eulerAngles;
         SpawnCargos();
         CalcPlatformAngle();
+        DrawLines();
     }
 
     private void OnRandomizeBtnClick()
@@ -49,29 +52,32 @@ public class PlatformGround : MonoBehaviour
             var angle = cargoAngles[i];
             var mass = cargoMasses[i];
             var angleRad = angle * Mathf.PI / 180f;
-            var cargoPos = new Vector3(Radius * Mathf.Sin(angleRad), 0f, Radius * Mathf.Cos(angleRad));
+            var cargoPos = new Vector3(CargoPlaceRadius * Mathf.Sin(angleRad), 0f, CargoPlaceRadius * Mathf.Cos(angleRad));
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, angle, 0));
             cargo.transform.SetParent(cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
-
-            DrawLine(cargoPos);
-
-            cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z));
+            cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z), angleRad);
             _cargos.Add(cargoScript);
         }
     }
     
 
-    private void DrawLine(Vector3 cargoPosition)
+    private void DrawLine(Vector2 cargoPosition, float angleRad)
     {
         var lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         lineObj.transform.SetParent(linesHolder.transform);
         var lineRenderer = lineObj.GetComponent<LineRenderer>();
         
         lineRenderer.widthMultiplier = 0.2f;
-        lineRenderer.SetPosition(0, Vector3.zero);
-        lineRenderer.SetPosition(1, cargoPosition);
+        
+        var startPos = new Vector3(RingRadius * Mathf.Sin(angleRad), 0f, RingRadius * Mathf.Cos(angleRad));
+        startPos += ring.transform.position;
+
+        lineRenderer.SetPosition(0, startPos);
+        lineRenderer.SetPosition(1, new Vector3(cargoPosition.x, 0, cargoPosition.y));
     }
+
+
 
     private void CalcPlatformAngle()
     {
@@ -85,8 +91,34 @@ public class PlatformGround : MonoBehaviour
         //var signVector = new Vector2(Math.Sign(resultForce.x), Math.Sign(resultForce.y));
         //var force = new Vector2(Mathf.Sqrt(Mathf.Abs(resultForce.x)), Mathf.Sqrt(Mathf.Abs(resultForce.y))) * signVector;
         
-        transform.rotation = Quaternion.Euler(_originalRotation.x + resultForce.y, _originalRotation.y, _originalRotation.z + resultForce.x);
+        //transform.rotation = Quaternion.Euler(_originalRotation.x + resultForce.y, _originalRotation.y, _originalRotation.z + resultForce.x);
+
+        resultForce /= 50f;
+        ring.transform.position = new Vector3(resultForce.x, ring.transform.position.y, resultForce.y);
+        
+        if (resultForce == Vector2.zero)
+        {
+            
+        }
     }
+    
+    private void ClearLines()
+    {
+        foreach (Transform child in linesHolder.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+    
+    private void DrawLines()
+    {
+        ClearLines();
+        foreach (var cargo in _cargos)
+        {
+            DrawLine(cargo.Position, cargo.AngleRad);
+        }
+    }
+    
 
     private int _counter;
     void FixedUpdate()
@@ -98,5 +130,6 @@ public class PlatformGround : MonoBehaviour
             return;
         
         CalcPlatformAngle();
+        DrawLines();
     }
 }
