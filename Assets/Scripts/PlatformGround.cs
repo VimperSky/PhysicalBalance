@@ -29,6 +29,8 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject winTextPrefab;
     [SerializeField] private GameObject loseTextPrefab;
 
+    [SerializeField] private  GameObject cargoPickPanel;
+
     [SerializeField] private Transform canvasTransform;
 
     private bool _gameIsStarted;
@@ -103,11 +105,14 @@ public class PlatformGround : MonoBehaviour
         {
             // Победа
             Instantiate(winTextPrefab, canvasTransform, false);
+            cargoPickPanel.SetActive(false);
+            
         }
         else
         { 
             // Поражение
             Instantiate(loseTextPrefab, canvasTransform, false);
+            cargoPickPanel.SetActive(false);
         }
     }
     

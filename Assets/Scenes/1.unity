@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3708985, g: 0.3783704, b: 0.35722548, a: 1}
+  m_IndirectSpecularColor: {r: 0.37089851, g: 0.3783701, b: 0.3572253, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -191,10 +191,10 @@ RectTransform:
   m_Father: {fileID: 809956927}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 550, y: 0}
-  m_SizeDelta: {x: -1100, y: -200}
+  m_AnchorMin: {x: 0.21452086, y: 0.044000003}
+  m_AnchorMax: {x: 0.79, y: 0.23237039}
+  m_AnchoredPosition: {x: -4.5, y: 0.5}
+  m_SizeDelta: {x: -5, y: -3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &95740967
 MonoBehaviour:
@@ -337,10 +337,10 @@ RectTransform:
   m_Father: {fileID: 95740966}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 100}
-  m_SizeDelta: {x: 300, y: 80}
+  m_AnchorMin: {x: 0.049000002, y: 0.185}
+  m_AnchorMax: {x: 0.31827274, y: 0.545}
+  m_AnchoredPosition: {x: -2.000061, y: -2.9999847}
+  m_SizeDelta: {x: 6, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &367486491
 MonoBehaviour:
@@ -474,10 +474,10 @@ RectTransform:
   m_Father: {fileID: 95740966}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -100}
-  m_SizeDelta: {x: 300, y: 80}
+  m_AnchorMin: {x: 0.6805455, y: 0.185}
+  m_AnchorMax: {x: 0.95100003, y: 0.545}
+  m_AnchoredPosition: {x: 2.5, y: -2.9999847}
+  m_SizeDelta: {x: 3, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &411678742
 MonoBehaviour:
@@ -1683,10 +1683,10 @@ RectTransform:
   m_Father: {fileID: 95740966}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 80}
+  m_AnchorMin: {x: 0.36245456, y: 0.185}
+  m_AnchorMax: {x: 0.5, y: 0.545}
+  m_AnchoredPosition: {x: 75.5, y: -2.9999847}
+  m_SizeDelta: {x: 149, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1806351118
 MonoBehaviour:
@@ -1925,10 +1925,10 @@ MonoBehaviour:
   linesHolder: {fileID: 1532264144}
   linePrefab: {fileID: 8462567638596488241, guid: 153f58419d063884a93a8ff90015a11b, type: 3}
   ring: {fileID: 8216249235691098476}
-  randomizeBtn: {fileID: 0}
   unknownCargoId: 2
-  winTextPrefab: {fileID: 5037165078435287119, guid: 1181a3fc772f4554981ca9cf78388a03, type: 3}
-  loseTextPrefab: {fileID: 5037165078435287119, guid: b2fb4ea9e84c97045ab22b448952aead, type: 3}
+  winTextPrefab: {fileID: 2508437551470615392, guid: 680616ba6ac77c0459bc72c640c378bb, type: 3}
+  loseTextPrefab: {fileID: 2508437551470615392, guid: c10c49f2d107a514a8158152c034937e, type: 3}
+  cargoPickPanel: {fileID: 95740965}
   canvasTransform: {fileID: 809956927}
 --- !u!1001 &2108761813
 PrefabInstance:
