@@ -88,13 +88,7 @@ public class PlatformGround : MonoBehaviour
             resultForce += cargo.Force;
         }
 
-        // Чтобы не так сильно наклонялось, но пока не будем делать
-        //var signVector = new Vector2(Math.Sign(resultForce.x), Math.Sign(resultForce.y));
-        //var force = new Vector2(Mathf.Sqrt(Mathf.Abs(resultForce.x)), Mathf.Sqrt(Mathf.Abs(resultForce.y))) * signVector;
-        
-        //transform.rotation = Quaternion.Euler(_originalRotation.x + resultForce.y, _originalRotation.y, _originalRotation.z + resultForce.x);
-
-        resultForce /= 50f;
+        resultForce /= 75f;
         ring.transform.position = new Vector3(resultForce.x, ring.transform.position.y, resultForce.y);
 
         if (!_gameIsStarted) 
@@ -106,7 +100,6 @@ public class PlatformGround : MonoBehaviour
             // Победа
             Instantiate(winTextPrefab, canvasTransform, false);
             cargoPickPanel.SetActive(false);
-            
         }
         else
         { 
