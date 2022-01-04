@@ -131,14 +131,11 @@ public class PlatformGround : MonoBehaviour
         {
             DrawLine(cargo.Position, cargo.AngleRad);
             var centerPos = new Vector2(ring.transform.position.x, ring.transform.position.z);
-            //var centerPos = Vector2.zero;
             
             var newAngle = Mathf.Atan2(cargo.Position.y - centerPos.y, cargo.Position.x - centerPos.x) * Mathf.Rad2Deg;
             if (newAngle < 0)
                 newAngle += 360;
-            //var newAngle = Vector2.Angle(cargo.Position - centerPos, Vector2.right);
 
-            var normalAngle = cargo.AngleRad * Mathf.Rad2Deg;
             cargo.gameObject.transform.rotation = Quaternion.Euler(0, 90 - newAngle, 0);
         }
     }
