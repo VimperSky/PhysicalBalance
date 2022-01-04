@@ -33,11 +33,7 @@ public class Cargo: MonoBehaviour
 
         transform.GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = !isUnknown ? this.mass.ToString() : "?";
     }
-
-    public void SetAngle(float angleRad)
-    {
-        AngleRad = angleRad;
-    }
+    
 
     public Vector2 Force => Position * mass;
 

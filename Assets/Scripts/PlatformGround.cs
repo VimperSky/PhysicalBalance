@@ -50,9 +50,9 @@ public class PlatformGround : MonoBehaviour
         {
             var cargoData = levelData.CargoDatas[i];
             var angleRad = cargoData.Angle * Mathf.PI / 180f;
-            var cargoPos = new Vector3( CargoPlaceRadius * Mathf.Sin(angleRad), 0f, CargoPlaceRadius * Mathf.Cos(angleRad));
+            var cargoPos = new Vector3( CargoPlaceRadius * Mathf.Cos(angleRad), 0f, CargoPlaceRadius * Mathf.Sin(angleRad));
             cargoPos += cargosHolder.transform.position;
-            var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, cargoData.Angle, 0), cargosHolder.transform);
+            var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, 90 - cargoData.Angle, 0), cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
             cargoScript.SetData(cargoData.Mass, new Vector2(cargoPos.x, cargoPos.z), angleRad, i == levelData.UnknownCargoId);
             _cargos.Add(cargoScript);
@@ -68,9 +68,9 @@ public class PlatformGround : MonoBehaviour
         
         lineRenderer.widthMultiplier = 0.1f;
         
-        var startPos = new Vector3(RingRadius * Mathf.Sin(angleRad), 0f, RingRadius * Mathf.Cos(angleRad));
+        var startPos = new Vector3(RingRadius * Mathf.Cos(angleRad), 0f, RingRadius * Mathf.Sin(angleRad));
         startPos += ring.transform.position;
-
+        
         lineRenderer.SetPosition(0, startPos);
         lineRenderer.SetPosition(1, new Vector3(cargoPosition.x, _ringStartPosition.y, cargoPosition.y));
     }
@@ -125,10 +125,21 @@ public class PlatformGround : MonoBehaviour
     
     private void DrawLines()
     {
+
         ClearLines();
         foreach (var cargo in _cargos)
         {
             DrawLine(cargo.Position, cargo.AngleRad);
+            var centerPos = new Vector2(ring.transform.position.x, ring.transform.position.z);
+            //var centerPos = Vector2.zero;
+            
+            var newAngle = Mathf.Atan2(cargo.Position.y - centerPos.y, cargo.Position.x - centerPos.x) * Mathf.Rad2Deg;
+            if (newAngle < 0)
+                newAngle += 360;
+            //var newAngle = Vector2.Angle(cargo.Position - centerPos, Vector2.right);
+
+            var normalAngle = cargo.AngleRad * Mathf.Rad2Deg;
+            cargo.gameObject.transform.rotation = Quaternion.Euler(0, 90 - newAngle, 0);
         }
     }
     
