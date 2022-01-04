@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -21,6 +20,8 @@ public class EndGameController: MonoBehaviour
     private void NextLevel()
     {
         MusicProvider.Instance.PlayClick();
+        LevelDataKeeper.Instance.SetNextLevelData();
+        SceneManager.LoadScene(2);
     }
 
     private void GoHome()

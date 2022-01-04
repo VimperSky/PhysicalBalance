@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,41 +13,28 @@ public class LevelChoiceController : MonoBehaviour
     [SerializeField] private Button level5;
     
     [SerializeField] private Button close;
-
+    
     private void Awake()
     {
-        level1.onClick.AddListener(OpenLevel1);
+        level1.onClick.AddListener(() => OpenLevelWithData(1));
+        level2.onClick.AddListener(() => OpenLevelWithData(2));
+        level3.onClick.AddListener(() => OpenLevelWithData(3));
+        level4.onClick.AddListener(() => OpenLevelWithData(4));
+        level5.onClick.AddListener(() => OpenLevelWithData(5));
+
         close.onClick.AddListener(OnClose);
     }
 
-    private void OpenLevel1()
+    private void OpenLevelWithData(int levelId)
     {
+        LevelDataKeeper.Instance.SetLevelData(levelId);
         MusicProvider.Instance.PlayClick();
         SceneManager.LoadScene(2);
     }
-
+    
     private void OnClose()
     {
         MusicProvider.Instance.PlayClick();
         SceneManager.LoadScene(0);
     }
-
-    // public void Resume()
-    // {
-    //     PlaySoundOnClick();
-
-    //     pauseMenuUI.SetActive(false);
-    //     Time.timeScale = 1f;
-    //     isGamePaused = false;
-    // }
-
-    // public void Pause()
-    // {
-    //     PlaySoundOnClick();
-
-    //     pauseMenuUI.SetActive(true);
-    //     Time.timeScale = 0f;
-    //     isGamePaused = true;
-    // }
-    
 }

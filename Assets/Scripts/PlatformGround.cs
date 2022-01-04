@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class PlatformGround : MonoBehaviour
 {
-    // Unity говно не умеет в массивы из сложных данных в инспекторе, поэтому такой костыль.
-    [SerializeField] private int[] cargoAngles;
-
-    [SerializeField] private int[] cargoMasses;
-    
     [SerializeField] private GameObject cargosHolder;
     [SerializeField] private GameObject cargoPrefab;
     [SerializeField] private GameObject linesHolder;
@@ -24,40 +20,41 @@ public class PlatformGround : MonoBehaviour
     
     private readonly List<Cargo> _cargos = new();
     
-    [SerializeField] private int unknownCargoId;
-
     [SerializeField] private GameObject winTextPrefab;
     [SerializeField] private GameObject loseTextPrefab;
 
-    [SerializeField] private  GameObject cargoPickPanel;
+    [SerializeField] private GameObject cargoPickPanel;
 
     [SerializeField] private Transform canvasTransform;
 
     private bool _gameIsStarted;
+
+    private Vector3 _ringStartPosition;
+    
+    private LevelData _levelData;
     
     void Start()
     {
-        SpawnCargos();
+        _levelData  = LevelDataKeeper.Instance.LevelData;
+        _ringStartPosition = ring.transform.position;
+        SpawnCargos(_levelData);
         CalcPlatformAngle();
         DrawLines();
-
+        
         _gameIsStarted = true;
     }
 
-    private void SpawnCargos()
+    private void SpawnCargos(LevelData levelData)
     {
-        if (cargoAngles.Length != cargoMasses.Length)
-            throw new ArgumentException("CargoAngles length should be equal to CargoMasses");
-        for (var i = 0; i < cargoAngles.Length; i++)
+        for (var i = 0; i < levelData.CargoDatas.Count; i++)
         {
-            var angle = cargoAngles[i];
-            var mass = cargoMasses[i];
-            var angleRad = angle * Mathf.PI / 180f;
-            var cargoPos = new Vector3(CargoPlaceRadius * Mathf.Sin(angleRad), 0f, CargoPlaceRadius * Mathf.Cos(angleRad));
-            var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, angle, 0));
-            cargo.transform.SetParent(cargosHolder.transform);
+            var cargoData = levelData.CargoDatas[i];
+            var angleRad = cargoData.Angle * Mathf.PI / 180f;
+            var cargoPos = new Vector3( CargoPlaceRadius * Mathf.Sin(angleRad), 0f, CargoPlaceRadius * Mathf.Cos(angleRad));
+            cargoPos += cargosHolder.transform.position;
+            var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, cargoData.Angle, 0), cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
-            cargoScript.SetData(mass, new Vector2(cargoPos.x, cargoPos.z), angleRad, i == unknownCargoId);
+            cargoScript.SetData(cargoData.Mass, new Vector2(cargoPos.x, cargoPos.z), angleRad, i == levelData.UnknownCargoId);
             _cargos.Add(cargoScript);
         }
     }
@@ -75,10 +72,14 @@ public class PlatformGround : MonoBehaviour
         startPos += ring.transform.position;
 
         lineRenderer.SetPosition(0, startPos);
-        lineRenderer.SetPosition(1, new Vector3(cargoPosition.x, 0, cargoPosition.y));
+        lineRenderer.SetPosition(1, new Vector3(cargoPosition.x, _ringStartPosition.y, cargoPosition.y));
     }
 
 
+    private static bool IsVictory(Vector2 force)
+    {
+        return Mathf.Abs(force.x) <= 0.05f && Mathf.Abs(force.y) <= 0.05f;
+    }
 
     private void CalcPlatformAngle()
     {
@@ -88,27 +89,32 @@ public class PlatformGround : MonoBehaviour
             resultForce += cargo.Force;
         }
 
-        resultForce /= 75f;
-        ring.transform.position = new Vector3(resultForce.x, ring.transform.position.y, resultForce.y);
-
+        resultForce /= 50f;
+        if (resultForce.x > 0.8f)
+            resultForce.x = 0.8f;
+        if (resultForce.y > 0.8)
+            resultForce.y = 0.8f;
+        
+        var ringPos = _ringStartPosition;
+        ring.transform.position = new Vector3(ringPos.x + resultForce.x, ringPos.y, ringPos.z + resultForce.y);
+        
         if (!_gameIsStarted) 
             return;
         _gameIsStarted = false;
 
-        if (resultForce == Vector2.zero)
+        if (IsVictory(resultForce))
         {
-            // Победа
             Instantiate(winTextPrefab, canvasTransform, false);
             cargoPickPanel.SetActive(false);
         }
         else
         { 
-            // Поражение
             Instantiate(loseTextPrefab, canvasTransform, false);
             cargoPickPanel.SetActive(false);
         }
     }
     
+
     private void ClearLines()
     {
         foreach (Transform child in linesHolder.transform)
@@ -126,14 +132,13 @@ public class PlatformGround : MonoBehaviour
         }
     }
     
-    
 
-    public void ChangeMass(int value)
+    public void ChangeMass(float value)
     {
         if (!_gameIsStarted)
             return;
         
-        _cargos[unknownCargoId].SetMass(value, true);
+        _cargos[_levelData.UnknownCargoId].SetMass(value, true);
         
         CalcPlatformAngle();
         DrawLines();
