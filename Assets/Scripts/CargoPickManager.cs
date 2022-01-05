@@ -1,6 +1,4 @@
-﻿using System;
-using Data;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,6 +19,8 @@ public class CargoPickManager: MonoBehaviour
         InitCargoPick(cargoPick1, levelData.CargoChoosingMasses[0]);
         InitCargoPick(cargoPick2, levelData.CargoChoosingMasses[1]);
         InitCargoPick(cargoPick3, levelData.CargoChoosingMasses[2]);
+
+        gameObject.SetActive(Config.IsDebugMode);
     }
 
     private void InitCargoPick(Button cargoPick, float value)
@@ -32,5 +32,16 @@ public class CargoPickManager: MonoBehaviour
     private void PickMass(float mass)
     {
         platformGround.ChangeMass(mass);
+    }
+    
+    
+    public void TargetFound()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void TargetLost()
+    {
+        gameObject.SetActive(false);
     }
 }

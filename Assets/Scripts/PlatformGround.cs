@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Data;
 using UnityEngine;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class PlatformGround : MonoBehaviour
 {
@@ -27,23 +23,55 @@ public class PlatformGround : MonoBehaviour
 
     [SerializeField] private Transform canvasTransform;
 
-    private bool _gameIsStarted;
-
     private Vector3 _ringStartPosition;
     
-    private LevelData _levelData;
+    // Костыли, чтобы работал AR
+    private Vector2 _ringStartPhysicsPosition;
+    private Vector2 _ringPhysicsPosition;
     
-    void Start()
+    private LevelData _levelData;
+
+    private GameState _gameState = GameState.NotStarted;
+
+    public void TargetFound()
     {
+        if (Config.IsDebugMode)
+            return;
+            
+        InitGame();
+    }
+    
+    public void TargetLost()
+    {
+        if (Config.IsDebugMode)
+            return;
+    }
+
+    private void Start()
+    {
+        if (Config.IsDebugMode)
+            InitGame();
+    }
+
+    private void InitGame()
+    {
+        if (_gameState != GameState.NotStarted) 
+            return;
+        
         _levelData  = LevelDataKeeper.Instance.LevelData;
-        _ringStartPosition = ring.transform.position;
+        
+        // Это все костыли для AR
+        _ringStartPosition = ring.transform.localPosition;
+        _ringStartPhysicsPosition = new Vector2(ring.transform.position.x, ring.transform.position.z);
+        _ringPhysicsPosition = _ringStartPhysicsPosition;
+        
         SpawnCargos(_levelData);
         CalcPlatformAngle();
         DrawLines();
         
-        _gameIsStarted = true;
+        _gameState = GameState.Started;
     }
-
+    
     private void SpawnCargos(LevelData levelData)
     {
         for (var i = 0; i < levelData.CargoDatas.Count; i++)
@@ -60,8 +88,9 @@ public class PlatformGround : MonoBehaviour
     }
     
 
-    private void DrawLine(Vector2 cargoPosition, float angleRad)
+    private void DrawLine(Cargo cargo, float angleRad)
     {
+        var cargoPosition = new Vector2(cargo.transform.position.x, cargo.transform.position.z);
         var lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
         lineObj.transform.SetParent(linesHolder.transform);
         var lineRenderer = lineObj.GetComponent<LineRenderer>();
@@ -72,13 +101,13 @@ public class PlatformGround : MonoBehaviour
         startPos += ring.transform.position;
         
         lineRenderer.SetPosition(0, startPos);
-        lineRenderer.SetPosition(1, new Vector3(cargoPosition.x, _ringStartPosition.y, cargoPosition.y));
+        lineRenderer.SetPosition(1, new Vector3(cargoPosition.x, linesHolder.transform.position.y, cargoPosition.y));
     }
 
 
     private static bool IsVictory(Vector2 force)
     {
-        return Mathf.Abs(force.x) <= 0.05f && Mathf.Abs(force.y) <= 0.05f;
+        return Mathf.Abs(force.x) <= 0.01f && Mathf.Abs(force.y) <= 0.01f;
     }
 
     private void CalcPlatformAngle()
@@ -89,18 +118,20 @@ public class PlatformGround : MonoBehaviour
             resultForce += cargo.Force;
         }
 
-        resultForce /= 50f;
-        if (resultForce.x > 0.8f)
-            resultForce.x = 0.8f;
-        if (resultForce.y > 0.8)
-            resultForce.y = 0.8f;
+        resultForce /= 400f;
+        if (resultForce.x > 0.1f)
+            resultForce.x = 0.1f;
+        if (resultForce.y > 0.1f)
+            resultForce.y = 0.1f;
+
+        // * 5f это костыль для AR, по-другому хз как сделать.
+        _ringPhysicsPosition = new Vector2(_ringStartPhysicsPosition.x + resultForce.x * 5f, _ringStartPhysicsPosition.y + resultForce.y * 5f);
         
-        var ringPos = _ringStartPosition;
-        ring.transform.position = new Vector3(ringPos.x + resultForce.x, ringPos.y, ringPos.z + resultForce.y);
+        ring.transform.localPosition = new Vector3(_ringStartPosition.x + resultForce.x, _ringStartPosition.y, _ringStartPosition.z + resultForce.y);
         
-        if (!_gameIsStarted) 
+        if (_gameState != GameState.Started) 
             return;
-        _gameIsStarted = false;
+        _gameState = GameState.Finished;
 
         if (IsVictory(resultForce))
         {
@@ -125,16 +156,19 @@ public class PlatformGround : MonoBehaviour
     
     private void DrawLines()
     {
-
         ClearLines();
         foreach (var cargo in _cargos)
         {
-            DrawLine(cargo.Position, cargo.AngleRad);
-            var centerPos = new Vector2(ring.transform.position.x, ring.transform.position.z);
+            DrawLine(cargo, cargo.AngleRad);
+            
+            // Костыль для работы AR
+            var centerPos = _ringPhysicsPosition;
             
             var newAngle = Mathf.Atan2(cargo.Position.y - centerPos.y, cargo.Position.x - centerPos.x) * Mathf.Rad2Deg;
-            if (newAngle < 0)
+            if (newAngle < 0)  
+            {
                 newAngle += 360;
+            }
 
             cargo.gameObject.transform.rotation = Quaternion.Euler(0, 90 - newAngle, 0);
         }
@@ -143,7 +177,7 @@ public class PlatformGround : MonoBehaviour
 
     public void ChangeMass(float value)
     {
-        if (!_gameIsStarted)
+        if (_gameState != GameState.Started)
             return;
         
         _cargos[_levelData.UnknownCargoId].SetMass(value, true);

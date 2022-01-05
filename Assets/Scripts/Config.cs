@@ -1,0 +1,31 @@
+using UnityEngine;
+
+public class Config : MonoBehaviour
+{
+    public static readonly bool IsDebugMode = true;
+
+    [SerializeField] private GameObject regularCamera;
+    [SerializeField] private GameObject arCamera;
+    [SerializeField] private GameObject imageTarget;
+    [SerializeField] private GameObject game;
+
+    private void Awake()
+    {
+        if (IsDebugMode)
+        {
+            arCamera.SetActive(false);
+            imageTarget.SetActive(false);
+            
+            regularCamera.SetActive(true);
+        }
+        else
+        {
+            regularCamera.SetActive(false);
+
+            game.transform.SetParent(imageTarget.transform);
+
+            arCamera.SetActive(true);
+            imageTarget.SetActive(true);
+        }
+    }
+}
