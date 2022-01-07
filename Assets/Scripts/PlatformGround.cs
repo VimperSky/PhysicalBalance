@@ -11,8 +11,8 @@ public class PlatformGround : MonoBehaviour
     
     [SerializeField] private GameObject ring;
     
-    private const float RingRadius = 1.25f;
-    private const float CargoPlaceRadius = 4.5f;
+    private const float RingRadius = 1.15f;
+    private const float CargoPlaceRadius = 4.75f;
     
     private readonly List<Cargo> _cargos = new();
     
@@ -32,6 +32,8 @@ public class PlatformGround : MonoBehaviour
     private LevelData _levelData;
 
     private GameState _gameState = GameState.NotStarted;
+
+    [SerializeField] private Material lineMaterial;
 
     public void TargetFound()
     {
@@ -95,7 +97,8 @@ public class PlatformGround : MonoBehaviour
         lineObj.transform.SetParent(linesHolder.transform);
         var lineRenderer = lineObj.GetComponent<LineRenderer>();
         
-        lineRenderer.widthMultiplier = 0.1f;
+        lineRenderer.widthMultiplier = 0.05f;
+        lineRenderer.material = lineMaterial;
         
         var startPos = new Vector3(RingRadius * Mathf.Cos(angleRad), 0f, RingRadius * Mathf.Sin(angleRad));
         startPos += ring.transform.position;
