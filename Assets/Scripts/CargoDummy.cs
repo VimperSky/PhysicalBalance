@@ -9,7 +9,7 @@ public class CargoDummy: MonoBehaviour
     {
         Mass = mass;
 
-        transform.GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = Mass.ToString();
+        transform.Find("Canvas").Find("TextMass").gameObject.GetComponent<TextMeshProUGUI>().text = Mass.ToString();
     }
 
 }

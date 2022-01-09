@@ -10,16 +10,17 @@ public class Cargo: MonoBehaviour
     
     public void SetData(float mass, CargoMediator cargoMediator, bool isUnknown)
     {
-        SetMass(mass, isUnknown);
-        
         CargoMediator = cargoMediator;
+
+        SetMass(mass, isUnknown);
     }
 
     public void SetMass(float mass, bool isUnknown)
     {
         this.mass = mass;
 
-        transform.GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = !isUnknown ? this.mass.ToString() : "?";
+        CargoMediator.SetDisplayedValue(mass, isUnknown);
+        //transform.Find("Canvas").Find("TextMass").gameObject.GetComponent<TextMeshProUGUI>().text = !isUnknown ? this.mass.ToString() : "?";
     }
     
 

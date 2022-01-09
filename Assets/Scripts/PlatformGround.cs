@@ -15,7 +15,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
-    private const float CargoPlaceRadius = 5f;
+    private const float CargoPlaceRadius = 5.05f;
     
     private readonly List<Cargo> _cargos = new();
     
@@ -99,9 +99,6 @@ public class PlatformGround : MonoBehaviour
             _cargos.Add(cargoScript);
         }
     }
-    
-    
-
 
     private static bool IsVictory(Vector2 force)
     {
