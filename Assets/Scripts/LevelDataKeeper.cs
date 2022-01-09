@@ -21,45 +21,46 @@ public class LevelDataKeeper : MonoBehaviour
         {
             CargoDatas = new List<CargoData>
             {
-                new() { Angle = 0, Mass = 10 },
-                new() { Angle = 60, Mass = 10 },
+                new() { Angle = -7, Mass = 5 },
+                new() { Angle = 7, Mass = 5 },
+                new() { Angle = 180, Mass = 0 }
+            },
+            CargoChoosingMasses = new List<float> {9f, 10f, 11f}, 
+            UnknownCargoId = 2
+        },
+        new LevelData
+        {
+            CargoDatas = new List<CargoData>
+            {
+                new() { Angle = -30, Mass = 5 },
+                new() { Angle = 30, Mass = 5 },
+                new() { Angle = 180, Mass = 0 }
+            },
+            CargoChoosingMasses = new List<float> {8f, 10f, 12f}, 
+            UnknownCargoId = 2
+        },
+        new LevelData
+        {
+            CargoDatas = new List<CargoData>
+            {
+                new() { Angle = 0, Mass = 7 },
+                new() { Angle = 90, Mass = 0 },
+                new() { Angle = 225, Mass = 10 }
+            },
+            CargoChoosingMasses = new List<float> {5, 7, 10},
+            UnknownCargoId = 1
+        },
+        new LevelData
+        {
+            CargoDatas = new List<CargoData>
+            {
+                new() { Angle = -30, Mass = 7 },
+                new() { Angle = 30, Mass = 5 },
+                new() { Angle = 150, Mass = 7 },
                 new() { Angle = 210, Mass = 0 }
             },
-            CargoChoosingMasses = new List<float> {15f, 17f, 20f},
-            UnknownCargoId = 2
-        },
-        new LevelData
-        {
-            CargoDatas = new List<CargoData>
-            {
-                new() { Angle = 45, Mass = 5 },
-                new() { Angle = 90, Mass = 5 },
-                new() { Angle = 270, Mass = 0 }
-            },
-            CargoChoosingMasses = new List<float> {5, 10, 15}, 
-            UnknownCargoId = 2
-        },
-        new LevelData
-        {
-            CargoDatas = new List<CargoData>
-            {
-                new() { Angle = 45, Mass = 5 },
-                new() { Angle = 90, Mass = 5 },
-                new() { Angle = 270, Mass = 0 }
-            },
-            CargoChoosingMasses = new List<float> {5, 10, 15},
-            UnknownCargoId = 2
-        },
-        new LevelData
-        {
-            CargoDatas = new List<CargoData>
-            {
-                new() { Angle = 45, Mass = 5 },
-                new() { Angle = 90, Mass = 5 },
-                new() { Angle = 270, Mass = 0 }
-            },
-            CargoChoosingMasses = new List<float> {5, 10, 15},
-            UnknownCargoId = 2
+            CargoChoosingMasses = new List<float> {5, 6, 7},
+            UnknownCargoId = 3
         }
     };
 

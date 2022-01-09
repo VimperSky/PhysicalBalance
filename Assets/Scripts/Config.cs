@@ -8,6 +8,7 @@ public class Config : MonoBehaviour
     [SerializeField] private GameObject arCamera;
     [SerializeField] private GameObject imageTarget;
     [SerializeField] private GameObject game;
+    [SerializeField] private Canvas canvas;
 
     private void Awake()
     {
@@ -17,6 +18,7 @@ public class Config : MonoBehaviour
             imageTarget.SetActive(false);
             
             regularCamera.SetActive(true);
+            canvas.worldCamera = regularCamera.GetComponent<Camera>();
         }
         else
         {
@@ -26,6 +28,7 @@ public class Config : MonoBehaviour
 
             arCamera.SetActive(true);
             imageTarget.SetActive(true);
+            canvas.worldCamera = arCamera.GetComponent<Camera>();
         }
     }
 }

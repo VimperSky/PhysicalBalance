@@ -3,27 +3,16 @@ using UnityEngine;
 
 public class Cargo: MonoBehaviour
 {
-    private Vector3 _originalScale;
+    public CargoMediator CargoMediator { get; private set; }
     
     [SerializeField]
     private float mass;
-
-    public Vector2 Position { get; private set; }
-    public float AngleRad { get; private set; }
     
-    private void Awake()
-    {
-        _originalScale = transform.localScale;
-    }
-
-    public void SetData(float mass, Vector2 position, float angleRad, bool isUnknown)
+    public void SetData(float mass, CargoMediator cargoMediator, bool isUnknown)
     {
         SetMass(mass, isUnknown);
         
-        Position = position;
-        AngleRad = angleRad;
-        transform.localScale = _originalScale * 5;
-        // transform.localScale = _originalScale * mass;
+        CargoMediator = cargoMediator;
     }
 
     public void SetMass(float mass, bool isUnknown)
@@ -34,6 +23,6 @@ public class Cargo: MonoBehaviour
     }
     
 
-    public Vector2 Force => Position * mass;
+    public Vector2 Force => CargoMediator.Position * mass;
 
 }

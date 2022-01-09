@@ -1,5 +1,4 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class CargoPickManager: MonoBehaviour
@@ -10,8 +9,12 @@ public class CargoPickManager: MonoBehaviour
 
     [SerializeField] private Button cargoPick3;
     
+    [SerializeField] private GameObject cargoPrefab;
+
     [SerializeField] private PlatformGround platformGround;
 
+    private int _cargoId;
+    
     private void Start()
     {
         var levelData = LevelDataKeeper.Instance.LevelData;
@@ -25,7 +28,16 @@ public class CargoPickManager: MonoBehaviour
 
     private void InitCargoPick(Button cargoPick, float value)
     {
-        cargoPick.GetComponentInChildren<TextMeshProUGUI>().text = value.ToString();
+        var parent = cargoPick.transform.Find("CargoObj");
+        var cargo = Instantiate(cargoPrefab, parent);
+        //cargo.layer = 5; // UI
+        cargo.transform.localRotation = Quaternion.Euler(90f, 120f + ++_cargoId * 30f, 0);
+        cargo.transform.localPosition += new Vector3(0, 0.075f, 0);
+        var cargoScript = cargo.AddComponent<CargoDummy>();
+        cargoScript.SetMass(value);
+        //cargo.transform.Translate(0, 1f, 0);
+
+        //cargoPick.GetComponentInChildren<TextMeshProUGUI>().text = value.ToString();
         cargoPick.onClick.AddListener(() => PickMass(value));
     }
     
