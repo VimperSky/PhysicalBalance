@@ -31,8 +31,8 @@ public class CargoPickManager: MonoBehaviour
         var parent = cargoPick.transform.Find("CargoObj");
         var cargo = Instantiate(cargoPrefab, parent);
         //cargo.layer = 5; // UI
-        cargo.transform.localRotation = Quaternion.Euler(90f, 120f + ++_cargoId * 30f, 0);
-        cargo.transform.localPosition += new Vector3(0, 0.25f, 0);
+        cargo.transform.localRotation = Quaternion.Euler(90f, 150f, 0);
+        //cargo.transform.localPosition += new Vector3(0, 0.25f, 0);
         var cargoScript = cargo.AddComponent<CargoDummy>();
         cargoScript.SetMass(value);
         //cargo.transform.Translate(0, 1f, 0);
