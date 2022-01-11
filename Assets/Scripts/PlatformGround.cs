@@ -94,7 +94,12 @@ public class PlatformGround : MonoBehaviour
             var cargoPos = cargoBasePos + cargosHolder.transform.position;
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, 90 - cargoData.Angle, 0), cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
-            cargoScript.SetData(cargoData.Mass, cargoMediatorScript, i == levelData.UnknownCargoId);
+            cargoScript.SetData(cargoData.Mass, cargoMediatorScript);
+
+            if (i == _levelData.UnknownCargoId)
+            {
+                cargoScript.SetColor(Color.yellow);
+            }
             
             _cargos.Add(cargoScript);
         }
@@ -130,11 +135,13 @@ public class PlatformGround : MonoBehaviour
 
         if (IsVictory(resultForce))
         {
+            _cargos[_levelData.UnknownCargoId].SetColor(Color.green);
             Instantiate(winTextPrefab, canvasTransform, false);
             cargoPickPanel.SetActive(false);
         }
         else
         { 
+            _cargos[_levelData.UnknownCargoId].SetColor(Color.red);
             Instantiate(loseTextPrefab, canvasTransform, false);
             cargoPickPanel.SetActive(false);
         }
@@ -210,7 +217,7 @@ public class PlatformGround : MonoBehaviour
         if (_gameState != GameState.Started)
             return;
         
-        _cargos[_levelData.UnknownCargoId].SetMass(value, true);
+        _cargos[_levelData.UnknownCargoId].SetMass(value);
         
         CalcPlatformAngle();
         DrawLines();

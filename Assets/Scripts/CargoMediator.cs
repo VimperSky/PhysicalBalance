@@ -12,7 +12,10 @@ public class CargoMediator: MonoBehaviour
         Position = position;
         AngleRad = angleRad;
     }
-
+    public void SetColor(Color color)
+    {
+        transform.Find("Canvas").Find("TextMass").gameObject.GetComponent<TextMeshProUGUI>().color = color;
+    }
 
     public void SetDisplayedValue(float value, bool isUnknown)
     {

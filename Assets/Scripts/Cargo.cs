@@ -8,19 +8,24 @@ public class Cargo: MonoBehaviour
     [SerializeField]
     private float mass;
     
-    public void SetData(float mass, CargoMediator cargoMediator, bool isUnknown)
+    public void SetData(float mass, CargoMediator cargoMediator)
     {
         CargoMediator = cargoMediator;
 
-        SetMass(mass, isUnknown);
+        SetMass(mass);
     }
 
-    public void SetMass(float mass, bool isUnknown)
+    public void SetMass(float mass)
     {
         this.mass = mass;
 
-        CargoMediator.SetDisplayedValue(mass, isUnknown);
+        CargoMediator.SetDisplayedValue(mass, mass == 0f);
         //transform.Find("Canvas").Find("TextMass").gameObject.GetComponent<TextMeshProUGUI>().text = !isUnknown ? this.mass.ToString() : "?";
+    }
+
+    public void SetColor(Color color)
+    {
+        CargoMediator.SetColor(color);
     }
     
 
