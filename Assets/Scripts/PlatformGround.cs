@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Data;
+using TMPro;
 using UnityEngine;
 
 public class PlatformGround : MonoBehaviour
@@ -15,6 +16,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
+    private const float AngleDrawRadius = 2.5f;
     private const float CargoPlaceRadius = 5.05f;
     
     private readonly List<Cargo> _cargos = new();
@@ -25,6 +27,9 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject cargoPickPanel;
 
     [SerializeField] private Transform canvasTransform;
+
+    [SerializeField] private GameObject anglePrefab;
+    [SerializeField] private GameObject anglePrefabHolder;
 
     private Vector3 _ringStartPosition;
     
@@ -82,8 +87,19 @@ public class PlatformGround : MonoBehaviour
         for (var i = 0; i < levelData.CargoDatas.Count; i++)
         {
             var cargoData = levelData.CargoDatas[i];
-            var angleRad = cargoData.Angle * Mathf.PI / 180f;
+            var angleRad = cargoData.Angle * Mathf.Deg2Rad;
             var cargoBasePos = new Vector3( CargoPlaceRadius * Mathf.Cos(angleRad), 0f, CargoPlaceRadius * Mathf.Sin(angleRad));
+            
+            var prevAngleId = i == 0 ? levelData.CargoDatas.Count - 1 : i - 1;
+            var prevAngle = levelData.CargoDatas[prevAngleId].Angle;
+           
+            var angleDelta = Mathf.DeltaAngle(cargoData.Angle, prevAngle);
+            var targetAngle = (cargoData.Angle + angleDelta / 2);
+            var targetAngleRad = targetAngle  * Mathf.Deg2Rad;
+            var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f, AngleDrawRadius * Mathf.Sin(targetAngleRad));
+            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180 - 90 - targetAngle, 0), anglePrefabHolder.transform);
+            angleObj.transform.position += anglePrefabHolder.transform.position;
+            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(angleDelta).ToString();
             
             var mediatorPos = cargoBasePos + cargosMediatorHolder.transform.position;
             var cargoMediator = Instantiate(cargoMediatorPrefab, mediatorPos, 
