@@ -4,6 +4,6 @@
     {
         public float Angle { get; set; }
         
-        public float Mass { get; set; }
+        public int Mass { get; set; }
     }
 }

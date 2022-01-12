@@ -14,7 +14,7 @@ public class LevelDataKeeper : MonoBehaviour
                 new() { Angle = 240, Mass = 5 },
                 new() { Angle = 0, Mass = 0 }
             },
-            CargoChoosingMasses = new List<float> {5, 7, 10},
+            CargoChoosingMasses = new () {5, 7, 10},
             UnknownCargoId = 2
         },
         new LevelData
@@ -25,7 +25,7 @@ public class LevelDataKeeper : MonoBehaviour
                 new() { Angle = 7, Mass = 5 },
                 new() { Angle = 180, Mass = 0 }
             },
-            CargoChoosingMasses = new List<float> {9f, 10f, 11f}, 
+            CargoChoosingMasses = new () {9, 10, 11}, 
             UnknownCargoId = 2
         },
         new LevelData
@@ -36,7 +36,7 @@ public class LevelDataKeeper : MonoBehaviour
                 new() { Angle = 30, Mass = 5 },
                 new() { Angle = 180, Mass = 0 }
             },
-            CargoChoosingMasses = new List<float> {8f, 10f, 12f}, 
+            CargoChoosingMasses = new () {8, 10, 12}, 
             UnknownCargoId = 2
         },
         new LevelData
@@ -47,7 +47,7 @@ public class LevelDataKeeper : MonoBehaviour
                 new() { Angle = 90, Mass = 0 },
                 new() { Angle = 225, Mass = 10 }
             },
-            CargoChoosingMasses = new List<float> {5, 7, 10},
+            CargoChoosingMasses = new () {5, 7, 10},
             UnknownCargoId = 1
         },
         new LevelData
@@ -59,7 +59,7 @@ public class LevelDataKeeper : MonoBehaviour
                 new() { Angle = 150, Mass = 7 },
                 new() { Angle = 210, Mass = 0 }
             },
-            CargoChoosingMasses = new List<float> {5, 6, 7},
+            CargoChoosingMasses = new () {5, 6, 7},
             UnknownCargoId = 3
         }
     };

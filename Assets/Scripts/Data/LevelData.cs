@@ -6,7 +6,7 @@ namespace Data
     {
         public List<CargoData> CargoDatas { get; set; }
         
-        public List<float> CargoChoosingMasses { get; set; }
+        public List<int> CargoChoosingMasses { get; set; }
         public int UnknownCargoId { get; set; }
     }
 }

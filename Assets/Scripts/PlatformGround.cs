@@ -212,7 +212,7 @@ public class PlatformGround : MonoBehaviour
     }
     
 
-    public void ChangeMass(float value)
+    public void ChangeMass(int value)
     {
         if (_gameState != GameState.Started)
             return;

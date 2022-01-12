@@ -26,7 +26,7 @@ public class CargoPickManager: MonoBehaviour
         gameObject.SetActive(Config.IsDebugMode);
     }
 
-    private void InitCargoPick(Button cargoPick, float value)
+    private void InitCargoPick(Button cargoPick, int value)
     {
         var parent = cargoPick.transform.Find("CargoObj");
         var cargo = Instantiate(cargoPrefab, parent);
@@ -41,7 +41,7 @@ public class CargoPickManager: MonoBehaviour
         cargoPick.onClick.AddListener(() => PickMass(value));
     }
     
-    private void PickMass(float mass)
+    private void PickMass(int mass)
     {
         platformGround.ChangeMass(mass);
     }
