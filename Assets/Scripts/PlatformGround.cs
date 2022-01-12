@@ -105,10 +105,15 @@ public class PlatformGround : MonoBehaviour
         }
     }
 
-    private static bool IsVictory(Vector2 force)
+    private static bool IsPlatformInBalance(Vector2 force)
     {
         return Mathf.Abs(force.x) <= 0.01f && Mathf.Abs(force.y) <= 0.01f;
     }
+
+    private int _cargosLeft = 4;
+
+    private bool IsDefeat => _cargosLeft <= 0 || _cargos[_levelData.UnknownCargoId].TotalMass >= _levelData.DefeatMass;
+
 
     private void CalcPlatformAngle()
     {
@@ -131,16 +136,17 @@ public class PlatformGround : MonoBehaviour
         
         if (_gameState != GameState.Started) 
             return;
-        _gameState = GameState.Finished;
-
-        if (IsVictory(resultForce))
+        
+        if (IsPlatformInBalance(resultForce))
         {
+            _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.green);
             Instantiate(winTextPrefab, canvasTransform, false);
             cargoPickPanel.SetActive(false);
         }
-        else
-        { 
+        else if (IsDefeat)
+        {
+            _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.red);
             Instantiate(loseTextPrefab, canvasTransform, false);
             cargoPickPanel.SetActive(false);
@@ -212,12 +218,13 @@ public class PlatformGround : MonoBehaviour
     }
     
 
-    public void ChangeMass(int value)
+    public void AddCargoMass(int value)
     {
         if (_gameState != GameState.Started)
             return;
         
-        _cargos[_levelData.UnknownCargoId].SetMass(value);
+        _cargosLeft--;
+        _cargos[_levelData.UnknownCargoId].AdjustCargoMass(value);
         
         CalcPlatformAngle();
         DrawLines();
