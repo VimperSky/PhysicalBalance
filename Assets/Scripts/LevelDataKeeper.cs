@@ -23,21 +23,21 @@ public class LevelDataKeeper : MonoBehaviour
         {
             CargoDatas = new List<CargoData>
             {
-                new() { Angle = -15, Mass = 5 },
-                new() { Angle = 15, Mass = 5 },
+                new() { Angle = -25f, Mass = 5 },
+                new() { Angle = 25f, Mass = 5 },
                 new() { Angle = 180, Mass = 0 }
             },
             CargoChoosingMasses = new () {1, 3, 3, 5}, 
             // Solution: 9
-            DefeatMass = 10,
+            DefeatMass = 11,
             UnknownCargoId = 2
         },
         new LevelData
         {
             CargoDatas = new List<CargoData>
             {
-                new() { Angle = 0, Mass = 0 },
-                new() { Angle = 90, Mass = 7 },
+                new() { Angle = 0f, Mass = 0 },
+                new() { Angle = 90f, Mass = 7 },
                 new() { Angle = 225, Mass = 10 }
             },
             CargoChoosingMasses = new () {1, 2, 3, 5},
@@ -63,9 +63,9 @@ public class LevelDataKeeper : MonoBehaviour
         {
             CargoDatas = new List<CargoData>
             {
-                new() { Angle = -40, Mass = 5 },
+                new() { Angle = -45f, Mass = 5 },
                 new() { Angle = 0, Mass = 0 },
-                new() { Angle = 40, Mass = 5 },
+                new() { Angle = 45f, Mass = 5 },
                 new() { Angle = 180, Mass = 12 }
             },
             CargoChoosingMasses = new () {1, 2, 3, 5},

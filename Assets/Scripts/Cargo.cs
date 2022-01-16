@@ -66,6 +66,7 @@ public class Cargo: MonoBehaviour
     {
         CargoMediator.SetColor(color);
     }
+
     
 
     public Vector2 Force => CargoMediator.Position * _totalMass;
