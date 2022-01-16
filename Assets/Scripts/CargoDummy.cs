@@ -1,15 +1,9 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CargoDummy: MonoBehaviour
 {
-    public float Mass { get; private set; }
-    
-    public void SetMass(float mass)
+    private void Update()
     {
-        Mass = mass;
-
-        transform.Find("Canvas").Find("TextMass").gameObject.GetComponent<TextMeshProUGUI>().text = Mass.ToString();
+        transform.Rotate(new Vector3(15f, 0, 15f) * Time.deltaTime);
     }
-
 }

@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Data;
+using TMPro;
 using UnityEngine;
 
 public class PlatformGround : MonoBehaviour
@@ -15,6 +18,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
+    private const float AngleDrawRadius = 2.5f;
     private const float CargoPlaceRadius = 5.05f;
     
     private readonly List<Cargo> _cargos = new();
@@ -25,6 +29,11 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject cargoPickPanel;
 
     [SerializeField] private Transform canvasTransform;
+
+    [SerializeField] private GameObject anglePrefab;
+    [SerializeField] private GameObject anglePrefabHolder;
+
+    [SerializeField] private GameObject hud;
 
     private Vector3 _ringStartPosition;
     
@@ -37,6 +46,17 @@ public class PlatformGround : MonoBehaviour
     private GameState _gameState = GameState.NotStarted;
 
     [SerializeField] private Material lineMaterial;
+    [SerializeField] private GameObject formulaInfo;
+
+    private void SetAngleValueText(string value)
+    {
+        hud.transform.Find("AngleValue").GetComponent<TextMeshProUGUI>().text = value;
+    }
+    
+    private void SetMassValueText(string value)
+    {
+        hud.transform.Find("MassValue").GetComponent<TextMeshProUGUI>().text = value;
+    }
 
     public void TargetFound()
     {
@@ -82,14 +102,25 @@ public class PlatformGround : MonoBehaviour
         for (var i = 0; i < levelData.CargoDatas.Count; i++)
         {
             var cargoData = levelData.CargoDatas[i];
-            var angleRad = cargoData.Angle * Mathf.PI / 180f;
+            var angleRad = cargoData.Angle * Mathf.Deg2Rad;
             var cargoBasePos = new Vector3( CargoPlaceRadius * Mathf.Cos(angleRad), 0f, CargoPlaceRadius * Mathf.Sin(angleRad));
+            
+            var prevAngleId = i == 0 ? levelData.CargoDatas.Count - 1 : i - 1;
+            var prevAngle = levelData.CargoDatas[prevAngleId].Angle;
+           
+            var angleDelta = Mathf.DeltaAngle(cargoData.Angle, prevAngle);
+            var targetAngle = (cargoData.Angle + angleDelta / 2);
+            var targetAngleRad = targetAngle  * Mathf.Deg2Rad;
+            var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f, AngleDrawRadius * Mathf.Sin(targetAngleRad));
+            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180 - 90 - targetAngle, 0), anglePrefabHolder.transform);
+            angleObj.transform.position += anglePrefabHolder.transform.position;
+            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(angleDelta).ToString();
             
             var mediatorPos = cargoBasePos + cargosMediatorHolder.transform.position;
             var cargoMediator = Instantiate(cargoMediatorPrefab, mediatorPos, 
                 Quaternion.Euler(0, 90 - cargoData.Angle, 0), cargosMediatorHolder.transform);
             var cargoMediatorScript = cargoMediator.AddComponent<CargoMediator>();
-            cargoMediatorScript.SetData(new Vector2(cargoBasePos.x, cargoBasePos.y), angleRad);
+            cargoMediatorScript.SetData(new Vector2(cargoBasePos.x, cargoBasePos.z), angleRad);
 
             var cargoPos = cargoBasePos + cargosHolder.transform.position;
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, 90 - cargoData.Angle, 0), cargosHolder.transform);
@@ -103,26 +134,67 @@ public class PlatformGround : MonoBehaviour
             
             _cargos.Add(cargoScript);
         }
+
+        var totalMass = _cargos.Sum(x => x.TotalMass);
+        SetMassValueText(totalMass.ToString());
     }
 
-    private static bool IsVictory(Vector2 force)
+    private static bool IsPlatformInBalance(Vector2 force)
     {
-        return Mathf.Abs(force.x) <= 0.01f && Mathf.Abs(force.y) <= 0.01f;
+        return Mathf.Abs(force.x) <= 0.001f && Mathf.Abs(force.y) <= 0.001f;
     }
 
+    private int _cargosLeft = 4;
+
+    private bool IsDefeat => _cargosLeft <= 0 || _cargos[_levelData.UnknownCargoId].TotalMass >= _levelData.DefeatMass;
+
+
+    
     private void CalcPlatformAngle()
     {
+        var formulaString = "F = (";
+        var resultForceFake = new Vector2();
         var resultForce = new Vector2();
-        foreach (var cargo in _cargos)
+        for (var i = 0; i < _cargos.Count; i++)
         {
-            resultForce += cargo.Force;
+            resultForce += _cargos[i].Force;
+            var angle = _levelData.CargoDatas[i].Angle;
+            
+            var mediator = _cargos[i].CargoMediator;
+            resultForceFake += new Vector2(Mathf.Cos(mediator.AngleRad), Mathf.Sin(mediator.AngleRad)) * _cargos[i].TotalMass;
+            formulaString += $"(cos({angle}),sin({angle})) * {_cargos[i].TotalMass}";
+            
+            if (i != _cargos.Count - 1)
+                formulaString += " + ";
         }
 
-        resultForce /= 400f;
-        if (resultForce.x > 0.1f)
-            resultForce.x = 0.1f;
-        if (resultForce.y > 0.1f)
-            resultForce.y = 0.1f;
+        formulaString += " ) / ( ";
+
+        int sumMass = 0;
+        for (var i = 0; i < _cargos.Count; i++)
+        {
+            var cargo = _cargos[i];
+            sumMass += cargo.TotalMass;
+
+            formulaString += cargo.TotalMass;
+            if (i != _cargos.Count - 1)
+                formulaString += " + ";
+        }
+        
+        resultForceFake /= sumMass;
+        resultForce /= sumMass;
+        resultForce /= 30f;
+
+        //formulaString += $") / {sumMassFake} = " + (new Vector2(MathF.Truncate(resultForceFake.x * 100) / 100, MathF.Truncate(resultForce.y * 100) / 100)).ToString("0.0");
+        formulaString += ") = " + resultForceFake.ToString("0.00");
+
+        var resultAngle = Mathf.Atan2(resultForce.x , resultForce.y) * Mathf.Rad2Deg;
+        if (resultAngle < 0)
+            resultAngle += 360;
+        if (IsPlatformInBalance(resultForce))
+            SetAngleValueText("0");
+        else
+            SetAngleValueText(resultAngle.ToString("0.0"));
 
         // * 5f это костыль для AR, по-другому хз как сделать.
         _ringPhysicsPosition = new Vector2(_ringStartPhysicsPosition.x + resultForce.x, _ringStartPhysicsPosition.y + resultForce.y);
@@ -131,18 +203,27 @@ public class PlatformGround : MonoBehaviour
         
         if (_gameState != GameState.Started) 
             return;
-        _gameState = GameState.Finished;
-
-        if (IsVictory(resultForce))
+        
+        if (IsPlatformInBalance(resultForce))
         {
+            _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.green);
             Instantiate(winTextPrefab, canvasTransform, false);
+            
+            var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
+            formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
+            
             cargoPickPanel.SetActive(false);
         }
-        else
-        { 
+        else if (IsDefeat)
+        {
+            _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.red);
             Instantiate(loseTextPrefab, canvasTransform, false);
+            
+            var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
+            formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
+            
             cargoPickPanel.SetActive(false);
         }
     }
@@ -212,13 +293,16 @@ public class PlatformGround : MonoBehaviour
     }
     
 
-    public void ChangeMass(int value)
+    public void AddCargoMass(int value)
     {
         if (_gameState != GameState.Started)
             return;
         
-        _cargos[_levelData.UnknownCargoId].SetMass(value);
+        _cargosLeft--;
+        _cargos[_levelData.UnknownCargoId].AdjustCargoMass(value);
         
+        var totalMass = _cargos.Sum(x => x.TotalMass);
+        SetMassValueText(totalMass.ToString());
         CalcPlatformAngle();
         DrawLines();
     }

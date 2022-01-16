@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class CargoPickManager: MonoBehaviour
@@ -9,6 +11,8 @@ public class CargoPickManager: MonoBehaviour
 
     [SerializeField] private Button cargoPick3;
     
+    [SerializeField] private Button cargoPick4;
+
     [SerializeField] private GameObject cargoPrefab;
 
     [SerializeField] private PlatformGround platformGround;
@@ -22,6 +26,7 @@ public class CargoPickManager: MonoBehaviour
         InitCargoPick(cargoPick1, levelData.CargoChoosingMasses[0]);
         InitCargoPick(cargoPick2, levelData.CargoChoosingMasses[1]);
         InitCargoPick(cargoPick3, levelData.CargoChoosingMasses[2]);
+        InitCargoPick(cargoPick4, levelData.CargoChoosingMasses[3]);
 
         gameObject.SetActive(Config.IsDebugMode);
     }
@@ -29,21 +34,22 @@ public class CargoPickManager: MonoBehaviour
     private void InitCargoPick(Button cargoPick, int value)
     {
         var parent = cargoPick.transform.Find("CargoObj");
-        var cargo = Instantiate(cargoPrefab, parent);
+        cargoPick.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = value.ToString();
+        var cargo = Instantiate(Resources.Load($"Prefabs/CargoMass/{value}"), parent) as GameObject;
         //cargo.layer = 5; // UI
-        cargo.transform.localRotation = Quaternion.Euler(90f, 150f, 0);
-        //cargo.transform.localPosition += new Vector3(0, 0.25f, 0);
-        var cargoScript = cargo.AddComponent<CargoDummy>();
-        cargoScript.SetMass(value);
-        //cargo.transform.Translate(0, 1f, 0);
+        //cargo.transform.localPosition += new Vector3(0, -cargo.transform.localScale.y / 20f, 0);
+        cargo.transform.localRotation = Quaternion.Euler(0f, 75f, 75f);
+        cargo.AddComponent<CargoDummy>();
 
         //cargoPick.GetComponentInChildren<TextMeshProUGUI>().text = value.ToString();
-        cargoPick.onClick.AddListener(() => PickMass(value));
+        cargoPick.onClick.AddListener(() => AddCargoMass(cargoPick, value));
     }
     
-    private void PickMass(int mass)
+    private void AddCargoMass(Button cargoPick, int mass)
     {
-        platformGround.ChangeMass(mass);
+        cargoPick.gameObject.SetActive(false);
+        platformGround.AddCargoMass(mass);
+        MusicProvider.Instance.PlayClick();
     }
     
     
