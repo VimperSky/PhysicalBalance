@@ -105,7 +105,7 @@ public class PlatformGround : MonoBehaviour
             var cargoMediator = Instantiate(cargoMediatorPrefab, mediatorPos, 
                 Quaternion.Euler(0, 90 - cargoData.Angle, 0), cargosMediatorHolder.transform);
             var cargoMediatorScript = cargoMediator.AddComponent<CargoMediator>();
-            cargoMediatorScript.SetData(new Vector2(cargoBasePos.x, cargoBasePos.y), angleRad);
+            cargoMediatorScript.SetData(new Vector2(cargoBasePos.x, cargoBasePos.z), angleRad);
 
             var cargoPos = cargoBasePos + cargosHolder.transform.position;
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, 90 - cargoData.Angle, 0), cargosHolder.transform);

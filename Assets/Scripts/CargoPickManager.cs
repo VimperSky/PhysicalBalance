@@ -49,6 +49,7 @@ public class CargoPickManager: MonoBehaviour
     {
         cargoPick.gameObject.SetActive(false);
         platformGround.AddCargoMass(mass);
+        MusicProvider.Instance.PlayClick();
     }
     
     

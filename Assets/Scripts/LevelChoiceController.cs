@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Data;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;

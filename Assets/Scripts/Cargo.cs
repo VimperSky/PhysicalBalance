@@ -10,7 +10,7 @@ public class Cargo: MonoBehaviour
 
     private float _lastMassY;
 
-    private static readonly List<int> PossibleVariants = new() { 5, 2, 1 };
+    private static readonly List<int> PossibleVariants = new() { 5, 3, 2, 1 };
 
 
     public int TotalMass => _totalMass;
@@ -38,7 +38,7 @@ public class Cargo: MonoBehaviour
         
         var cargoMasses = SplitMass(totalMassValue);
 
-        _lastMassY = transform.position.y;
+        _lastMassY = transform.localPosition.y;
         foreach (var mass in cargoMasses)
         {
             AddCargoMass(mass);
@@ -56,9 +56,9 @@ public class Cargo: MonoBehaviour
     private void AddCargoMass(int cargoMassValue)
     {
         var newObj = Instantiate(Resources.Load($"Prefabs/CargoMass/{cargoMassValue}"), transform) as GameObject;
-        var newPosition = new Vector3(transform.position.x,  _lastMassY + newObj.transform.localScale.y / 14f, transform.position.z);
-        newObj.transform.position = newPosition;
-        _lastMassY = newObj.transform.position.y + newObj.transform.localScale.y / 14f;
+        var newPosition = new Vector3(0f,  _lastMassY + newObj.transform.localScale.y / 50f, 0f);
+        newObj.transform.localPosition = newPosition;
+        _lastMassY = newObj.transform.localPosition.y + newObj.transform.localScale.y / 50f;
         _totalMass += cargoMassValue;
     }
 
