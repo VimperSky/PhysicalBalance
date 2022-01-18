@@ -14,12 +14,15 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject cargoPrefab;
     [SerializeField] private GameObject linesHolder;
     [SerializeField] private GameObject linePrefab;
-    
+    [SerializeField] private GameObject axisLinePrefab;
+
+    [SerializeField] private GameObject axisLinesHolder;
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
-    private const float AngleDrawRadius = 2f;
-    
+    private const float AngleDrawRadius = 2.5f;
+    private const float AxisDrawRadius = 4.75f;
+
     private readonly List<Cargo> _cargos = new();
     
     [SerializeField] private GameObject winTextPrefab;
@@ -87,10 +90,45 @@ public class PlatformGround : MonoBehaviour
         _ringPhysicsPosition = _ringStartPhysicsPosition;
         
         SpawnCargos(_levelData);
+        DrawAxis();
         CalcPlatformAngle();
         DrawLines();
         
         _gameState = GameState.Started;
+    }
+
+    private static Vector3 GetAnglePos(float angleRad)
+    {
+        return new Vector3( AxisDrawRadius * Mathf.Cos(angleRad), 0f, AxisDrawRadius * Mathf.Sin(angleRad));
+    }
+    
+    private void DrawAxis()
+    {
+        var angle0 = 0;
+        var angle1 = 180 * Mathf.Deg2Rad;
+
+        var angle2 = 90 * Mathf.Deg2Rad;
+        var angle3 = 270 * Mathf.Deg2Rad;
+        
+        {
+            var lineObj = Instantiate(axisLinePrefab, Vector3.zero, Quaternion.identity);
+            lineObj.transform.position += linesHolder.transform.position;
+            var lineRenderer = lineObj.GetComponent<LineRenderer>();
+        
+            lineRenderer.widthMultiplier = 0.01f;
+            lineRenderer.SetPosition(0, GetAnglePos(angle0));
+            lineRenderer.SetPosition(1, GetAnglePos(angle1));
+        }
+
+        {
+            var lineObj = Instantiate(axisLinePrefab, Vector3.zero, Quaternion.identity);
+            lineObj.transform.position += linesHolder.transform.position;
+            var lineRenderer = lineObj.GetComponent<LineRenderer>();
+        
+            lineRenderer.widthMultiplier = 0.01f;
+            lineRenderer.SetPosition(0, GetAnglePos(angle2));
+            lineRenderer.SetPosition(1, GetAnglePos(angle3));
+        }
     }
     
     private void SpawnCargos(LevelData levelData)
@@ -128,7 +166,7 @@ public class PlatformGround : MonoBehaviour
 
     private int _cargosLeft = 4;
 
-    private bool IsDefeat => _cargosLeft <= 0 || _cargos[_levelData.UnknownCargoId].TotalMass >= _levelData.DefeatMass;
+    private bool IsDefeat => _cargosLeft <= -5 || _cargos[_levelData.UnknownCargoId].TotalMass >= _levelData.DefeatMass;
 
 
     
@@ -166,17 +204,13 @@ public class PlatformGround : MonoBehaviour
             }
         }
         
-        int sumMass = 0;
-        for (var i = 0; i < _cargos.Count; i++)
-        {
-            var cargo = _cargos[i];
-            sumMass += cargo.TotalMass;
-        }
+        var sumMass = _cargos.Sum(cargo => cargo.TotalMass);
         
-        resultForcePhys /= sumMass;
-
-        formulaX += $") / {sumMass} = {resultForcePhys.x:0.00}";
-        formulaY += $") / {sumMass}= {resultForcePhys.y:0.00}";
+        //formulaX += $") / {sumMass} = {resultForcePhys.x:0.00}";
+        //formulaY += $") / {sumMass}= {resultForcePhys.y:0.00}";
+        
+        formulaX += $") / {sumMass}";
+        formulaY += $") / {sumMass}";
 
         formula.text = formulaX + "\n" + formulaY;
         
@@ -205,6 +239,8 @@ public class PlatformGround : MonoBehaviour
             _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.green);
             Instantiate(winTextPrefab, canvasTransform, false);
+
+            Destroy(GameObject.Find("GameCondition"));
             
             // var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
             // formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
@@ -216,7 +252,8 @@ public class PlatformGround : MonoBehaviour
             _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.red);
             Instantiate(loseTextPrefab, canvasTransform, false);
-            
+            Destroy(GameObject.Find("GameCondition"));
+
             // var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
             // formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
             
@@ -295,17 +332,15 @@ public class PlatformGround : MonoBehaviour
             var targetAngle = _cargos[i].Angle;
             var targetAngleRad = _cargos[i].CargoMediator.AngleRad;
             
-            
             var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
             var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180  - targetAngle, 0),
                 anglePrefabHolder.transform);
             var position = angleObj.transform.position;
             position += anglePrefabHolder.transform.position;
-            angleObj.transform.position = new Vector3(position.x + _ringPhysicsPosition.x * 5,
-                position.y, position.z + _ringPhysicsPosition.y * 5);
+            angleObj.transform.position = position;
             
-            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle).ToString();
+            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle) + "°";
             // var circle = angleObj.AddComponent<Circle>();
             // circle.segments = 32;
             // circle.xradius = 2f;
