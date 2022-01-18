@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Data;
@@ -18,7 +17,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
-    private const float AngleDrawRadius = 2.5f;
+    private const float AngleDrawRadius = 1f;
     private const float CargoPlaceRadius = 5.05f;
     
     private readonly List<Cargo> _cargos = new();
@@ -104,18 +103,7 @@ public class PlatformGround : MonoBehaviour
             var cargoData = levelData.CargoDatas[i];
             var angleRad = cargoData.Angle * Mathf.Deg2Rad;
             var cargoBasePos = new Vector3( CargoPlaceRadius * Mathf.Cos(angleRad), 0f, CargoPlaceRadius * Mathf.Sin(angleRad));
-            
-            var prevAngleId = i == 0 ? levelData.CargoDatas.Count - 1 : i - 1;
-            var prevAngle = levelData.CargoDatas[prevAngleId].Angle;
-           
-            var angleDelta = Mathf.DeltaAngle(cargoData.Angle, prevAngle);
-            var targetAngle = (cargoData.Angle + angleDelta / 2);
-            var targetAngleRad = targetAngle  * Mathf.Deg2Rad;
-            var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f, AngleDrawRadius * Mathf.Sin(targetAngleRad));
-            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180 - 90 - targetAngle, 0), anglePrefabHolder.transform);
-            angleObj.transform.position += anglePrefabHolder.transform.position;
-            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(angleDelta).ToString();
-            
+
             var mediatorPos = cargoBasePos + cargosMediatorHolder.transform.position;
             var cargoMediator = Instantiate(cargoMediatorPrefab, mediatorPos, 
                 Quaternion.Euler(0, 90 - cargoData.Angle, 0), cargosMediatorHolder.transform);
@@ -131,6 +119,8 @@ public class PlatformGround : MonoBehaviour
             {
                 cargoScript.SetColor(Color.yellow);
             }
+            
+
             
             _cargos.Add(cargoScript);
         }
@@ -236,8 +226,7 @@ public class PlatformGround : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
-    
-    
+
     private void DrawLineToMediator(CargoMediator cargo)
     {
         var lineObj = Instantiate(linePrefab, Vector3.zero, Quaternion.identity);
@@ -269,24 +258,49 @@ public class PlatformGround : MonoBehaviour
         lineRenderer.SetPosition(0, startPos);
         lineRenderer.SetPosition(1, endPos);
     }
-    
-    
+
     private void DrawLines()
     {
         ClearLines();
-        foreach (var cargo in _cargos)
+        for (var i = 0; i < _cargos.Count; i++)
         {
+            var cargo = _cargos[i];
+            var cargoData = _levelData.CargoDatas[i];
+            
             // Костыль для работы AR
             var centerPos = _ringPhysicsPosition;
-            
-            var newAngle = Mathf.Atan2(cargo.CargoMediator.Position.y - centerPos.y, cargo.CargoMediator.Position.x - centerPos.x) * Mathf.Rad2Deg;
-            if (newAngle < 0)  
-            {
-                newAngle += 360;
-            }
 
-            cargo.gameObject.transform.rotation = Quaternion.Euler(0, 90 - newAngle, 0);
+            // var newAngle = Mathf.Atan2(cargo.CargoMediator.Position.y - centerPos.y,
+            //     cargo.CargoMediator.Position.x - centerPos.x) * Mathf.Rad2Deg;
+            // if (newAngle < 0)
+            // {
+            //     newAngle += 360;
+            // }
+            //
+            // cargo.gameObject.transform.rotation = Quaternion.Euler(0, 90 - newAngle, 0);
+
+            var prevAngleId = i == 0 ? _levelData.CargoDatas.Count - 1 : i - 1;
+            var prevAngle = _levelData.CargoDatas[prevAngleId].Angle;
+
+            var angleDelta = Mathf.DeltaAngle(cargoData.Angle, prevAngle);
+            var targetAngle = cargoData.Angle + angleDelta / 2;
+            var targetAngleRad = targetAngle * Mathf.Deg2Rad;
+
+            var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
+                AngleDrawRadius * Mathf.Sin(targetAngleRad));
+            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180 - 90 - targetAngle, 0),
+                anglePrefabHolder.transform);
+            var position = angleObj.transform.position;
+            position += anglePrefabHolder.transform.position;
+            angleObj.transform.position = new Vector3(position.x + _ringPhysicsPosition.x * 5,
+                position.y, position.z + _ringPhysicsPosition.y * 5);
             
+            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(angleDelta).ToString();
+            var circle = angleObj.AddComponent<Circle>();
+            circle.segments = 32;
+            circle.xradius = 2.5f;
+            circle.yradius = 2.5f;
+
             DrawLineToMediator(cargo.CargoMediator);
             DrawLineToCargo(cargo);
         }

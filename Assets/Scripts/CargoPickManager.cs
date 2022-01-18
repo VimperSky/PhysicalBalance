@@ -1,5 +1,4 @@
 ﻿using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -47,7 +46,7 @@ public class CargoPickManager: MonoBehaviour
     
     private void AddCargoMass(Button cargoPick, int mass)
     {
-        cargoPick.gameObject.SetActive(false);
+        //cargoPick.gameObject.SetActive(false);
         platformGround.AddCargoMass(mass);
         MusicProvider.Instance.PlayClick();
     }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Config : MonoBehaviour
 {
-    public static readonly bool IsDebugMode = false;
+    public static readonly bool IsDebugMode = true;
 
     [SerializeField] private GameObject regularCamera;
     [SerializeField] private GameObject arCamera;
