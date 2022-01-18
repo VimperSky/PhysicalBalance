@@ -6,7 +6,7 @@ public class CargoMediator: MonoBehaviour
     public Vector2 Position { get; private set; }
     public float AngleRad { get; private set; }
     
-
+    
     public void SetData(Vector2 position, float angleRad)
     {
         Position = position;

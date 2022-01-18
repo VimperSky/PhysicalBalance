@@ -11,7 +11,10 @@ public class Cargo: MonoBehaviour
     private float _lastMassY;
 
     private static readonly List<int> PossibleVariants = new() { 5, 3, 2, 1 };
-
+    
+    public const float PlaceRadius = 5.05f;
+    
+    public float Angle { get; private set; }
 
     public int TotalMass => _totalMass;
     private List<int> SplitMass(int mass)
@@ -32,8 +35,9 @@ public class Cargo: MonoBehaviour
         return variants;
     }
     
-    public void SetData(int totalMassValue, CargoMediator cargoMediator)
+    public void SetData(float angle, int totalMassValue, CargoMediator cargoMediator)
     {
+        Angle = angle;
         CargoMediator = cargoMediator;
         
         var cargoMasses = SplitMass(totalMassValue);
@@ -45,6 +49,23 @@ public class Cargo: MonoBehaviour
         }
         
         CargoMediator.SetDisplayedValue(_totalMass, _totalMass == 0);
+    }
+
+    public void Rotate(float rotationDelta, GameObject cargosMediatorHolder, GameObject cargosHolder)
+    {
+        Angle += rotationDelta;
+        
+        var angleRad = Angle * Mathf.Deg2Rad;
+        var cargoBasePos = new Vector3( PlaceRadius * Mathf.Cos(angleRad), 0f, PlaceRadius * Mathf.Sin(angleRad));
+        var mediatorPos = cargoBasePos + cargosMediatorHolder.transform.position;
+
+        CargoMediator.transform.transform.position = mediatorPos;
+        CargoMediator.transform.transform.rotation = Quaternion.Euler(0, 90 - Angle, 0);
+        CargoMediator.SetData(new Vector2(cargoBasePos.x, cargoBasePos.z), angleRad);
+        
+        var cargoPos = cargoBasePos + cargosHolder.transform.position;
+        transform.position = cargoPos;
+        transform.rotation = Quaternion.Euler(0, 90 - Angle, 0);
     }
 
     public void AdjustCargoMass(int cargoMassValue)

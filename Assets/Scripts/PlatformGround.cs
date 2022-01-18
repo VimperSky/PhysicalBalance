@@ -19,7 +19,6 @@ public class PlatformGround : MonoBehaviour
     
     private const float RingRadius = 1.15f;
     private const float AngleDrawRadius = 2f;
-    private const float CargoPlaceRadius = 5.05f;
     
     private readonly List<Cargo> _cargos = new();
     
@@ -100,7 +99,7 @@ public class PlatformGround : MonoBehaviour
         {
             var cargoData = levelData.CargoDatas[i];
             var angleRad = cargoData.Angle * Mathf.Deg2Rad;
-            var cargoBasePos = new Vector3( CargoPlaceRadius * Mathf.Cos(angleRad), 0f, CargoPlaceRadius * Mathf.Sin(angleRad));
+            var cargoBasePos = new Vector3( Cargo.PlaceRadius * Mathf.Cos(angleRad), 0f, Cargo.PlaceRadius * Mathf.Sin(angleRad));
 
             var mediatorPos = cargoBasePos + cargosMediatorHolder.transform.position;
             var cargoMediator = Instantiate(cargoMediatorPrefab, mediatorPos, 
@@ -111,19 +110,15 @@ public class PlatformGround : MonoBehaviour
             var cargoPos = cargoBasePos + cargosHolder.transform.position;
             var cargo = Instantiate(cargoPrefab, cargoPos, Quaternion.Euler(0, 90 - cargoData.Angle, 0), cargosHolder.transform);
             var cargoScript = cargo.AddComponent<Cargo>();
-            cargoScript.SetData(cargoData.Mass, cargoMediatorScript);
+            cargoScript.SetData(cargoData.Angle, cargoData.Mass, cargoMediatorScript);
 
             if (i == _levelData.UnknownCargoId)
             {
                 cargoScript.SetColor(Color.yellow);
             }
-            
 
-            
             _cargos.Add(cargoScript);
         }
-
-        var totalMass = _cargos.Sum(x => x.TotalMass);
     }
 
     private static bool IsPlatformInBalance(Vector2 force)
@@ -141,13 +136,12 @@ public class PlatformGround : MonoBehaviour
     {
         var formulaX = "X: (";
         var formulaY = "Y: (";
-        var formulaString = "F = (";
         var resultForcePhys = new Vector2();
         var resultForce = new Vector2();
         for (var i = 0; i < _cargos.Count; i++)
         {
             resultForce += _cargos[i].Force;
-            var angle = _levelData.CargoDatas[i].Angle;
+            var angle = _cargos[i].Angle;
             
             var mediator = _cargos[i].CargoMediator;
             resultForcePhys += new Vector2(Mathf.Cos(mediator.AngleRad), Mathf.Sin(mediator.AngleRad)) * _cargos[i].TotalMass;
@@ -165,41 +159,31 @@ public class PlatformGround : MonoBehaviour
                 formulaY += "</b></color>";
             }
             
-            formulaString += $"(cos({angle})sin({angle})) * {_cargos[i].TotalMass}";
             if (i != _cargos.Count - 1)
             {
                 formulaX += " + ";
                 formulaY += " + ";
-                formulaString += " + ";
             }
         }
-
-        formulaString += " ) / ( ";
-
+        
         int sumMass = 0;
         for (var i = 0; i < _cargos.Count; i++)
         {
             var cargo = _cargos[i];
             sumMass += cargo.TotalMass;
-
-            formulaString += cargo.TotalMass;
-            if (i != _cargos.Count - 1)
-                formulaString += " + ";
         }
         
-        formulaX += $") = {resultForce.x:0.00}";
-        formulaY += $") = {resultForce.y:0.00}";
+        resultForcePhys /= sumMass;
+
+        formulaX += $") / {sumMass} = {resultForcePhys.x:0.00}";
+        formulaY += $") / {sumMass}= {resultForcePhys.y:0.00}";
 
         formula.text = formulaX + "\n" + formulaY;
         
-        resultForcePhys /= sumMass;
         resultForce /= sumMass;
         resultForce /= 30f;
 
-
-        //formulaString += $") / {sumMassFake} = " + (new Vector2(MathF.Truncate(resultForceFake.x * 100) / 100, MathF.Truncate(resultForce.y * 100) / 100)).ToString("0.0");
-        formulaString += ") = " + resultForcePhys.ToString("0.00");
-
+        
         var resultAngle = Mathf.Atan2(resultForce.x , resultForce.y) * Mathf.Rad2Deg;
         if (resultAngle < 0)
             resultAngle += 360;
@@ -305,14 +289,10 @@ public class PlatformGround : MonoBehaviour
             // }
             //
             // cargo.gameObject.transform.rotation = Quaternion.Euler(0, 90 - newAngle, 0);
-
-            var prevAngleId = i == 0 ? _levelData.CargoDatas.Count - 1 : i - 1;
-            var prevAngle = _levelData.CargoDatas[prevAngleId].Angle;
-
-            var angleDelta = Mathf.DeltaAngle(cargoData.Angle, prevAngle);
+            
             //var targetAngle = cargoData.Angle + angleDelta / 2;
             //var targetAngleRad = targetAngle * Mathf.Deg2Rad;
-            var targetAngle = _levelData.CargoDatas[i].Angle;
+            var targetAngle = _cargos[i].Angle;
             var targetAngleRad = _cargos[i].CargoMediator.AngleRad;
             
             
@@ -349,13 +329,20 @@ public class PlatformGround : MonoBehaviour
         DrawLines();
     }
 
+    private void Rotate(float delta)
+    {
+        _cargos[_levelData.UnknownCargoId].Rotate(delta, cargosMediatorHolder, cargosHolder);
+        CalcPlatformAngle();
+        DrawLines();
+    }
+
     public void RotateLeft()
     {
-        
+        Rotate(5f);
     }
 
     public void RotateRight()
     {
-        
+        Rotate(-5f);
     }
 }
