@@ -3,6 +3,7 @@ using System.Linq;
 using Data;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlatformGround : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
-    private const float AngleDrawRadius = 1f;
+    private const float AngleDrawRadius = 2f;
     private const float CargoPlaceRadius = 5.05f;
     
     private readonly List<Cargo> _cargos = new();
@@ -33,6 +34,8 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject anglePrefabHolder;
 
     [SerializeField] private GameObject hud;
+
+    [SerializeField] private TextMeshProUGUI formula;
 
     private Vector3 _ringStartPosition;
     
@@ -142,8 +145,11 @@ public class PlatformGround : MonoBehaviour
     
     private void CalcPlatformAngle()
     {
+        var massString = "Mass = -(";
+        var formulaX = "X: (";
+        var formulaY = "Y: (";
         var formulaString = "F = (";
-        var resultForceFake = new Vector2();
+        var resultForcePhys = new Vector2();
         var resultForce = new Vector2();
         for (var i = 0; i < _cargos.Count; i++)
         {
@@ -151,8 +157,19 @@ public class PlatformGround : MonoBehaviour
             var angle = _levelData.CargoDatas[i].Angle;
             
             var mediator = _cargos[i].CargoMediator;
-            resultForceFake += new Vector2(Mathf.Cos(mediator.AngleRad), Mathf.Sin(mediator.AngleRad)) * _cargos[i].TotalMass;
-            formulaString += $"(cos({angle}),sin({angle})) * {_cargos[i].TotalMass}";
+            resultForcePhys += new Vector2(Mathf.Cos(mediator.AngleRad), Mathf.Sin(mediator.AngleRad)) * _cargos[i].TotalMass;
+            massString += $"cos{angle}sin{angle} * {_cargos[i].TotalMass}";
+
+            formulaX += $"cos{angle} * {_cargos[i].TotalMass}";
+            formulaY += $"sin{angle} * {_cargos[i].TotalMass}";
+            
+            if (i != _cargos.Count - 1)
+            {
+                massString += " + ";
+                formulaX += " + ";
+                formulaY += " + ";
+            }
+            formulaString += $"(cos({angle})sin({angle})) * {_cargos[i].TotalMass}";
             
             if (i != _cargos.Count - 1)
                 formulaString += " + ";
@@ -171,12 +188,18 @@ public class PlatformGround : MonoBehaviour
                 formulaString += " + ";
         }
         
-        resultForceFake /= sumMass;
+        formulaX += $") = {resultForce.x:0.00}";
+        formulaY += $") = {resultForce.y:0.00}";
+
+        formula.text = formulaX + "\n" + formulaY;
+        
+        resultForcePhys /= sumMass;
         resultForce /= sumMass;
         resultForce /= 30f;
 
+
         //formulaString += $") / {sumMassFake} = " + (new Vector2(MathF.Truncate(resultForceFake.x * 100) / 100, MathF.Truncate(resultForce.y * 100) / 100)).ToString("0.0");
-        formulaString += ") = " + resultForceFake.ToString("0.00");
+        formulaString += ") = " + resultForcePhys.ToString("0.00");
 
         var resultAngle = Mathf.Atan2(resultForce.x , resultForce.y) * Mathf.Rad2Deg;
         if (resultAngle < 0)
@@ -283,23 +306,26 @@ public class PlatformGround : MonoBehaviour
             var prevAngle = _levelData.CargoDatas[prevAngleId].Angle;
 
             var angleDelta = Mathf.DeltaAngle(cargoData.Angle, prevAngle);
-            var targetAngle = cargoData.Angle + angleDelta / 2;
-            var targetAngleRad = targetAngle * Mathf.Deg2Rad;
-
+            //var targetAngle = cargoData.Angle + angleDelta / 2;
+            //var targetAngleRad = targetAngle * Mathf.Deg2Rad;
+            var targetAngle = _levelData.CargoDatas[i].Angle;
+            var targetAngleRad = _cargos[i].CargoMediator.AngleRad;
+            
+            
             var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
-            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180 - 90 - targetAngle, 0),
+            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180  - targetAngle, 0),
                 anglePrefabHolder.transform);
             var position = angleObj.transform.position;
             position += anglePrefabHolder.transform.position;
             angleObj.transform.position = new Vector3(position.x + _ringPhysicsPosition.x * 5,
                 position.y, position.z + _ringPhysicsPosition.y * 5);
             
-            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(angleDelta).ToString();
-            var circle = angleObj.AddComponent<Circle>();
-            circle.segments = 32;
-            circle.xradius = 2.5f;
-            circle.yradius = 2.5f;
+            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle).ToString();
+            // var circle = angleObj.AddComponent<Circle>();
+            // circle.segments = 32;
+            // circle.xradius = 2f;
+            // circle.yradius = 2f;
 
             DrawLineToMediator(cargo.CargoMediator);
             DrawLineToCargo(cargo);

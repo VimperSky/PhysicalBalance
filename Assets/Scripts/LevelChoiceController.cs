@@ -9,7 +9,8 @@ public class LevelChoiceController : MonoBehaviour
     [SerializeField] private Button level3;
     [SerializeField] private Button level4;
     [SerializeField] private Button level5;
-    
+    [SerializeField] private Button level6;
+
     [SerializeField] private Button close;
     
     private void Awake()
@@ -19,6 +20,7 @@ public class LevelChoiceController : MonoBehaviour
         level3.onClick.AddListener(() => OpenLevelWithData(3));
         level4.onClick.AddListener(() => OpenLevelWithData(4));
         level5.onClick.AddListener(() => OpenLevelWithData(5));
+        level6.onClick.AddListener(() => OpenLevelWithData(6));
 
         close.onClick.AddListener(OnClose);
     }
