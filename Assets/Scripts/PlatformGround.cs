@@ -348,4 +348,14 @@ public class PlatformGround : MonoBehaviour
         CalcPlatformAngle();
         DrawLines();
     }
+
+    public void RotateLeft()
+    {
+        
+    }
+
+    public void RotateRight()
+    {
+        
+    }
 }

@@ -8,7 +8,8 @@ namespace Data
         
         public List<int> CargoChoosingMasses { get; set; }
         public int UnknownCargoId { get; set; }
-        
         public int DefeatMass { get; set; }
+        
+        public bool IsRotationAvailable { get; set; }
     }
 }

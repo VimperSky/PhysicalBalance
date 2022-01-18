@@ -16,31 +16,50 @@ public class CargoPickManager: MonoBehaviour
 
     [SerializeField] private PlatformGround platformGround;
 
+    [SerializeField] private Button leftRotation;
+    [SerializeField] private Button rightRotation;
+
     private int _cargoId;
     
     private void Start()
     {
         var levelData = LevelDataKeeper.Instance.LevelData;
+
+        if (levelData.IsRotationAvailable)
+        {
+            leftRotation.gameObject.SetActive(true);
+            rightRotation.gameObject.SetActive(true);
+        }
         
         InitCargoPick(cargoPick1, levelData.CargoChoosingMasses[0]);
         InitCargoPick(cargoPick2, levelData.CargoChoosingMasses[1]);
         InitCargoPick(cargoPick3, levelData.CargoChoosingMasses[2]);
         InitCargoPick(cargoPick4, levelData.CargoChoosingMasses[3]);
+        
+        leftRotation.onClick.AddListener(OnLeftRotate);
+        rightRotation.onClick.AddListener(OnRightRotate);
 
         gameObject.SetActive(Config.IsDebugMode);
     }
 
+    private void OnLeftRotate()
+    {
+        platformGround.RotateLeft();
+    }
+    
+    private void OnRightRotate()
+    {
+        platformGround.RotateRight();
+    }
+    
     private void InitCargoPick(Button cargoPick, int value)
     {
         var parent = cargoPick.transform.Find("CargoObj");
         cargoPick.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = value.ToString();
         var cargo = Instantiate(Resources.Load($"Prefabs/CargoMass/{value}"), parent) as GameObject;
-        //cargo.layer = 5; // UI
-        //cargo.transform.localPosition += new Vector3(0, -cargo.transform.localScale.y / 20f, 0);
         cargo.transform.localRotation = Quaternion.Euler(0f, 75f, 75f);
         cargo.AddComponent<CargoDummy>();
 
-        //cargoPick.GetComponentInChildren<TextMeshProUGUI>().text = value.ToString();
         cargoPick.onClick.AddListener(() => AddCargoMass(cargoPick, value));
     }
     

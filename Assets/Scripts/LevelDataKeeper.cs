@@ -17,7 +17,8 @@ public class LevelDataKeeper : MonoBehaviour
             CargoChoosingMasses = new () {1, 2, 3, 5},
             // Solution: 5
             DefeatMass = 6,
-            UnknownCargoId = 2
+            UnknownCargoId = 2,
+            IsRotationAvailable = true
         },
         new LevelData
         {
@@ -30,7 +31,8 @@ public class LevelDataKeeper : MonoBehaviour
             CargoChoosingMasses = new () {1, 2, 3, 5}, 
             // Solution: 9
             DefeatMass = 11,
-            UnknownCargoId = 2
+            UnknownCargoId = 2,
+            IsRotationAvailable = true
         },
         new LevelData
         {
@@ -43,7 +45,8 @@ public class LevelDataKeeper : MonoBehaviour
             CargoChoosingMasses = new () {1, 2, 3, 5}, 
             // Solution: 7
             DefeatMass = 8,
-            UnknownCargoId = 0
+            UnknownCargoId = 0,
+            IsRotationAvailable = true
         },
         new LevelData
         {
@@ -56,7 +59,8 @@ public class LevelDataKeeper : MonoBehaviour
             CargoChoosingMasses = new () {1, 2, 3, 5},
             // Solution: 5
             DefeatMass = 6,
-            UnknownCargoId = 2
+            UnknownCargoId = 2,
+            IsRotationAvailable = true
         },
         new LevelData
         {
@@ -69,7 +73,8 @@ public class LevelDataKeeper : MonoBehaviour
             CargoChoosingMasses = new () {1, 2, 3, 5},
             // Solution: 5
             DefeatMass = 6,
-            UnknownCargoId = 2
+            UnknownCargoId = 2,
+            IsRotationAvailable = true
         },
         new LevelData
         {
@@ -82,7 +87,8 @@ public class LevelDataKeeper : MonoBehaviour
             CargoChoosingMasses = new () {1, 2, 3, 5},
             // Solution: 5
             DefeatMass = 6,
-            UnknownCargoId = 2
+            UnknownCargoId = 2,
+            IsRotationAvailable = true
         }
     };
 
