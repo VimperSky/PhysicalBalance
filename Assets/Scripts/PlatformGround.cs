@@ -54,11 +54,6 @@ public class PlatformGround : MonoBehaviour
     {
         hud.transform.Find("AngleValue").GetComponent<TextMeshProUGUI>().text = value;
     }
-    
-    private void SetMassValueText(string value)
-    {
-        hud.transform.Find("MassValue").GetComponent<TextMeshProUGUI>().text = value;
-    }
 
     public void TargetFound()
     {
@@ -129,7 +124,6 @@ public class PlatformGround : MonoBehaviour
         }
 
         var totalMass = _cargos.Sum(x => x.TotalMass);
-        SetMassValueText(totalMass.ToString());
     }
 
     private static bool IsPlatformInBalance(Vector2 force)
@@ -145,7 +139,6 @@ public class PlatformGround : MonoBehaviour
     
     private void CalcPlatformAngle()
     {
-        var massString = "Mass = -(";
         var formulaX = "X: (";
         var formulaY = "Y: (";
         var formulaString = "F = (";
@@ -158,21 +151,27 @@ public class PlatformGround : MonoBehaviour
             
             var mediator = _cargos[i].CargoMediator;
             resultForcePhys += new Vector2(Mathf.Cos(mediator.AngleRad), Mathf.Sin(mediator.AngleRad)) * _cargos[i].TotalMass;
-            massString += $"cos{angle}sin{angle} * {_cargos[i].TotalMass}";
-
+            
+            if (i == _levelData.UnknownCargoId)
+            {
+                formulaX += "<b><color=yellow>";
+                formulaY += "<b><color=yellow>";
+            }
             formulaX += $"cos{angle} * {_cargos[i].TotalMass}";
             formulaY += $"sin{angle} * {_cargos[i].TotalMass}";
+            if (i == _levelData.UnknownCargoId)
+            {
+                formulaX += "</b></color>";
+                formulaY += "</b></color>";
+            }
             
+            formulaString += $"(cos({angle})sin({angle})) * {_cargos[i].TotalMass}";
             if (i != _cargos.Count - 1)
             {
-                massString += " + ";
                 formulaX += " + ";
                 formulaY += " + ";
-            }
-            formulaString += $"(cos({angle})sin({angle})) * {_cargos[i].TotalMass}";
-            
-            if (i != _cargos.Count - 1)
                 formulaString += " + ";
+            }
         }
 
         formulaString += " ) / ( ";
@@ -223,8 +222,8 @@ public class PlatformGround : MonoBehaviour
             _cargos[_levelData.UnknownCargoId].SetColor(Color.green);
             Instantiate(winTextPrefab, canvasTransform, false);
             
-            var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
-            formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
+            // var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
+            // formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
             
             cargoPickPanel.SetActive(false);
         }
@@ -234,8 +233,8 @@ public class PlatformGround : MonoBehaviour
             _cargos[_levelData.UnknownCargoId].SetColor(Color.red);
             Instantiate(loseTextPrefab, canvasTransform, false);
             
-            var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
-            formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
+            // var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
+            // formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
             
             cargoPickPanel.SetActive(false);
         }
@@ -245,6 +244,11 @@ public class PlatformGround : MonoBehaviour
     private void ClearLines()
     {
         foreach (Transform child in linesHolder.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        
+        foreach (Transform child in anglePrefabHolder.transform)
         {
             Destroy(child.gameObject);
         }
@@ -341,8 +345,6 @@ public class PlatformGround : MonoBehaviour
         _cargosLeft--;
         _cargos[_levelData.UnknownCargoId].AdjustCargoMass(value);
         
-        var totalMass = _cargos.Sum(x => x.TotalMass);
-        SetMassValueText(totalMass.ToString());
         CalcPlatformAngle();
         DrawLines();
     }

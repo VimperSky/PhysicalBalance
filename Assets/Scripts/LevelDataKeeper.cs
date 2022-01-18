@@ -23,9 +23,9 @@ public class LevelDataKeeper : MonoBehaviour
         {
             CargoDatas = new List<CargoData>
             {
-                new() { Angle = -25f, Mass = 5 },
-                new() { Angle = 25f, Mass = 5 },
-                new() { Angle = 180, Mass = 0 }
+                new() { Angle = 0f, Mass = 5 },
+                new() { Angle = 50f, Mass = 5 },
+                new() { Angle = 225f, Mass = 0 }
             },
             CargoChoosingMasses = new () {1, 2, 3, 5}, 
             // Solution: 9
@@ -38,7 +38,7 @@ public class LevelDataKeeper : MonoBehaviour
             {
                 new() { Angle = 0f, Mass = 0 },
                 new() { Angle = 90f, Mass = 7 },
-                new() { Angle = 225, Mass = 10 }
+                new() { Angle = 225f, Mass = 10 }
             },
             CargoChoosingMasses = new () {1, 2, 3, 5}, 
             // Solution: 7
@@ -49,43 +49,40 @@ public class LevelDataKeeper : MonoBehaviour
         {
             CargoDatas = new List<CargoData>
             {
-                new() { Angle = -30, Mass = 7 },
-                new() { Angle = 30, Mass = 5 },
-                new() { Angle = 150, Mass = 7 },
-                new() { Angle = 210, Mass = 0 }
+                new() { Angle = 60, Mass = 5 },
+                new() { Angle = 120, Mass = 5 },
+                new() { Angle = 250, Mass = 0 }
             },
-            CargoChoosingMasses = new () {1, 2, 3, 5}, 
+            CargoChoosingMasses = new () {1, 2, 3, 5},
             // Solution: 5
             DefeatMass = 6,
-            UnknownCargoId = 3
+            UnknownCargoId = 2
         },
         new LevelData
         {
             CargoDatas = new List<CargoData>
             {
-                new() { Angle = -45f, Mass = 5 },
-                new() { Angle = 0, Mass = 0 },
-                new() { Angle = 45f, Mass = 5 },
-                new() { Angle = 180, Mass = 12 }
+                new() { Angle = 0, Mass = 5 },
+                new() { Angle = 30, Mass = 5 },
+                new() { Angle = 190, Mass = 0 }
             },
-            CargoChoosingMasses = new () {1, 2, 3, 5}, 
-            // Solution: 4 
-            DefeatMass = 5,
-            UnknownCargoId = 1
+            CargoChoosingMasses = new () {1, 2, 3, 5},
+            // Solution: 5
+            DefeatMass = 6,
+            UnknownCargoId = 2
         },
         new LevelData
         {
             CargoDatas = new List<CargoData>
             {
-                new() { Angle = -45f, Mass = 5 },
-                new() { Angle = 0, Mass = 0 },
-                new() { Angle = 45f, Mass = 5 },
-                new() { Angle = 180, Mass = 12 }
+                new() { Angle = 60, Mass = 5 },
+                new() { Angle = 120, Mass = 5 },
+                new() { Angle = 250, Mass = 0 }
             },
-            CargoChoosingMasses = new () {1, 2, 3, 5}, 
-            // Solution: 4 
-            DefeatMass = 5,
-            UnknownCargoId = 1
+            CargoChoosingMasses = new () {1, 2, 3, 5},
+            // Solution: 5
+            DefeatMass = 6,
+            UnknownCargoId = 2
         }
     };
 
