@@ -88,10 +88,14 @@ public class CargoPickManager: MonoBehaviour
     public void TargetFound()
     {
         gameObject.SetActive(true);
+        leftRotation.gameObject.SetActive(true);
+        rightRotation.gameObject.SetActive(true);
     }
 
     public void TargetLost()
     {
         gameObject.SetActive(false);
+        leftRotation.gameObject.SetActive(false);
+        rightRotation.gameObject.SetActive(false);
     }
 }

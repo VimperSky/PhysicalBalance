@@ -58,6 +58,8 @@ public class PlatformGround : MonoBehaviour
     {
         if (MenuConfig.Instance.IsDebug)
             return;
+        
+        hud.gameObject.SetActive(true);
             
         InitGame();
     }
@@ -66,6 +68,9 @@ public class PlatformGround : MonoBehaviour
     {
         if (MenuConfig.Instance.IsDebug)
             return;
+        
+        hud.gameObject.SetActive(false);
+
     }
 
     private void Start()
