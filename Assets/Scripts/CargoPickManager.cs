@@ -1,4 +1,6 @@
-﻿using TMPro;
+﻿using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,7 +41,7 @@ public class CargoPickManager: MonoBehaviour
         leftRotation.onClick.AddListener(OnLeftRotate);
         rightRotation.onClick.AddListener(OnRightRotate);
 
-        gameObject.SetActive(Config.IsDebugMode);
+        gameObject.SetActive(MenuConfig.Instance.IsDebug);
     }
 
     private void OnLeftRotate()
@@ -65,9 +67,21 @@ public class CargoPickManager: MonoBehaviour
     
     private void AddCargoMass(Button cargoPick, int mass)
     {
+        StartCoroutine(ChangeColor(cargoPick));
         //cargoPick.gameObject.SetActive(false);
         platformGround.AddCargoMass(mass);
         MusicProvider.Instance.PlayClick();
+    }
+
+    private IEnumerator ChangeColor(Button cargoPick)
+    {
+        var text = cargoPick.transform.Find("Value").GetComponent<TextMeshProUGUI>();
+        var defaultColor = text.color;
+        text.color = Color.green;
+
+        yield return new WaitForSeconds(1);
+        
+        text.color = defaultColor;
     }
     
     

@@ -1,9 +1,7 @@
 using UnityEngine;
 
-public class Config : MonoBehaviour
+public class GameConfigManager : MonoBehaviour
 {
-    public static readonly bool IsDebugMode = false;
-
     [SerializeField] private GameObject regularCamera;
     [SerializeField] private GameObject arCamera;
     [SerializeField] private GameObject imageTarget;
@@ -12,7 +10,7 @@ public class Config : MonoBehaviour
 
     private void Awake()
     {
-        if (IsDebugMode)
+        if (MenuConfig.Instance.IsDebug)
         {
             arCamera.SetActive(false);
             imageTarget.SetActive(false);

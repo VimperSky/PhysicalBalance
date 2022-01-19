@@ -11,5 +11,7 @@ namespace Data
         public int DefeatMass { get; set; }
         
         public bool IsRotationAvailable { get; set; }
+        
+        public bool IsFinalLevel { get; set; }
     }
 }

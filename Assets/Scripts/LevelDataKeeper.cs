@@ -88,7 +88,8 @@ public class LevelDataKeeper : MonoBehaviour
             // Solution: 5
             DefeatMass = 7,
             UnknownCargoId = 2,
-            IsRotationAvailable = true
+            IsRotationAvailable = true,
+            IsFinalLevel = true
         }
     };
 

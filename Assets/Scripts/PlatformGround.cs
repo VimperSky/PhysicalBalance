@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Data;
@@ -47,7 +48,6 @@ public class PlatformGround : MonoBehaviour
     private GameState _gameState = GameState.NotStarted;
 
     [SerializeField] private Material lineMaterial;
-    [SerializeField] private GameObject formulaInfo;
 
     private void SetAngleValueText(string value)
     {
@@ -56,7 +56,7 @@ public class PlatformGround : MonoBehaviour
 
     public void TargetFound()
     {
-        if (Config.IsDebugMode)
+        if (MenuConfig.Instance.IsDebug)
             return;
             
         InitGame();
@@ -64,15 +64,17 @@ public class PlatformGround : MonoBehaviour
     
     public void TargetLost()
     {
-        if (Config.IsDebugMode)
+        if (MenuConfig.Instance.IsDebug)
             return;
     }
 
     private void Start()
     {
-        if (Config.IsDebugMode)
+        if (MenuConfig.Instance.IsDebug)
             InitGame();
     }
+
+
 
     private void InitGame()
     {
@@ -211,6 +213,7 @@ public class PlatformGround : MonoBehaviour
 
         if (_levelData.IsRotationAvailable)
         {
+            formula.transform.parent.gameObject.SetActive(true);
             formula.text = formulaX + "\n" + formulaY;
         }
 
@@ -233,19 +236,24 @@ public class PlatformGround : MonoBehaviour
             _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.green);
             Instantiate(winTextPrefab, canvasTransform, false);
-            formula.text = "";
-
-            Destroy(GameObject.Find("GameCondition"));
+            formula.transform.parent.gameObject.SetActive(false);
+            
+            GameObject.Find("Home").SetActive(false);
             
             cargoPickPanel.SetActive(false);
+            
+            if (_levelData.IsFinalLevel)
+                GameObject.Find("Next").SetActive(false);
         }
         else if (IsDefeat)
         {
             _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.red);
             Instantiate(loseTextPrefab, canvasTransform, false);
-            Destroy(GameObject.Find("GameCondition"));
-            
+            formula.transform.parent.gameObject.SetActive(false);
+
+            GameObject.Find("Home").SetActive(false);
+
             cargoPickPanel.SetActive(false);
         }
     }
@@ -268,7 +276,8 @@ public class PlatformGround : MonoBehaviour
         lineRenderer.widthMultiplier = 0.04f;
         lineRenderer.material = lineMaterial;
         
-        var basePos = new Vector3(RingRadius * Mathf.Cos(cargo.AngleRad), 0f, RingRadius * Mathf.Sin(cargo.AngleRad));
+        var basePos = new Vector3(RingRadius * Mathf.Cos(cargo.AngleRad), 
+            0f, RingRadius * Mathf.Sin(cargo.AngleRad));
         basePos += ring.transform.position;
         
         lineRenderer.SetPosition(0, basePos);
@@ -286,7 +295,7 @@ public class PlatformGround : MonoBehaviour
         
         var startPos = cargo.transform.position;
         var endPos = cargo.CargoMediator.transform.position;
-        
+
         lineRenderer.SetPosition(0, startPos);
         lineRenderer.SetPosition(1, endPos);
     }
@@ -338,6 +347,7 @@ public class PlatformGround : MonoBehaviour
     {
         CalcPlatformAngle();
         PutAngles();
+        
         DrawLines();
     }
 
