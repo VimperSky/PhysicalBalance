@@ -297,12 +297,13 @@ public class PlatformGround : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        
-        foreach (var cargo in _cargos)
+
+        for (var index = 0; index < _cargos.Count; index++)
         {
+            var cargo = _cargos[index];
             var targetAngle = cargo.Angle;
             var targetAngleRad = cargo.CargoMediator.AngleRad;
-            
+
             var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
 
@@ -312,12 +313,14 @@ public class PlatformGround : MonoBehaviour
 
             if (angle > 360)
                 angle -= 360;
-            
+
             var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, angle, 0),
                 anglePrefabHolder.transform);
             angleObj.transform.position += anglePrefabHolder.transform.position;
 
             angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle) + "°";
+            if (index == _levelData.UnknownCargoId && _levelData.IsRotationAvailable)
+                angleObj.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
         }
     }
 
