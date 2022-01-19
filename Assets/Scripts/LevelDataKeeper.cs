@@ -72,7 +72,7 @@ public class LevelDataKeeper : MonoBehaviour
             },
             CargoChoosingMasses = new () {1, 2, 3, 5},
             // Solution: 9
-            DefeatMass = 10,
+            DefeatMass = 11,
             UnknownCargoId = 1,
             IsRotationAvailable = true
         },
@@ -86,7 +86,7 @@ public class LevelDataKeeper : MonoBehaviour
             },
             CargoChoosingMasses = new () {1, 2, 3, 5},
             // Solution: 5
-            DefeatMass = 15,
+            DefeatMass = 7,
             UnknownCargoId = 2,
             IsRotationAvailable = true
         }

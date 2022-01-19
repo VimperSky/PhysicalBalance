@@ -3,7 +3,6 @@ using System.Linq;
 using Data;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlatformGround : MonoBehaviour
 {
@@ -20,7 +19,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
-    private const float AngleDrawRadius = 5.25f;
+    private const float AngleDrawRadius = 4.9f;
     private const float AxisDrawRadius = 4.75f;
 
     private readonly List<Cargo> _cargos = new();
@@ -42,8 +41,6 @@ public class PlatformGround : MonoBehaviour
     private Vector3 _ringStartPosition;
     
     // Костыли, чтобы работал AR
-    private Vector2 _ringStartPhysicsPosition;
-    private Vector2 _ringPhysicsPosition;
     
     private LevelData _levelData;
 
@@ -86,14 +83,11 @@ public class PlatformGround : MonoBehaviour
         
         // Это все костыли для AR
         _ringStartPosition = ring.transform.localPosition;
-        _ringStartPhysicsPosition = new Vector2(ring.transform.position.x, ring.transform.position.z);
-        _ringPhysicsPosition = _ringStartPhysicsPosition;
         
         SpawnCargos(_levelData);
         DrawAxis();
-        CalcPlatformAngle();
-        DrawLines();
-        
+        CalculateGameState();
+
         _gameState = GameState.Started;
     }
 
@@ -229,9 +223,6 @@ public class PlatformGround : MonoBehaviour
         else
             SetAngleValueText(resultAngle.ToString("0"));
 
-        // * 5f это костыль для AR, по-другому хз как сделать.
-        _ringPhysicsPosition = new Vector2(_ringStartPhysicsPosition.x + resultForce.x, _ringStartPhysicsPosition.y + resultForce.y);
-        
         ring.transform.localPosition = new Vector3(_ringStartPosition.x + resultForce.x, _ringStartPosition.y, _ringStartPosition.z + resultForce.y);
         
         if (_gameState != GameState.Started) 
@@ -242,11 +233,9 @@ public class PlatformGround : MonoBehaviour
             _gameState = GameState.Finished;
             _cargos[_levelData.UnknownCargoId].SetColor(Color.green);
             Instantiate(winTextPrefab, canvasTransform, false);
+            formula.text = "";
 
             Destroy(GameObject.Find("GameCondition"));
-            
-            // var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
-            // formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
             
             cargoPickPanel.SetActive(false);
         }
@@ -256,9 +245,6 @@ public class PlatformGround : MonoBehaviour
             _cargos[_levelData.UnknownCargoId].SetColor(Color.red);
             Instantiate(loseTextPrefab, canvasTransform, false);
             Destroy(GameObject.Find("GameCondition"));
-
-            // var formulaInfoObj = Instantiate(formulaInfo, canvasTransform, false);
-            // formulaInfoObj.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = formulaString;
             
             cargoPickPanel.SetActive(false);
         }
@@ -268,11 +254,6 @@ public class PlatformGround : MonoBehaviour
     private void ClearLines()
     {
         foreach (Transform child in linesHolder.transform)
-        {
-            Destroy(child.gameObject);
-        }
-        
-        foreach (Transform child in anglePrefabHolder.transform)
         {
             Destroy(child.gameObject);
         }
@@ -287,10 +268,10 @@ public class PlatformGround : MonoBehaviour
         lineRenderer.widthMultiplier = 0.04f;
         lineRenderer.material = lineMaterial;
         
-        var startPos = new Vector3(RingRadius * Mathf.Cos(cargo.AngleRad), 0f, RingRadius * Mathf.Sin(cargo.AngleRad));
-        startPos += ring.transform.position;
+        var basePos = new Vector3(RingRadius * Mathf.Cos(cargo.AngleRad), 0f, RingRadius * Mathf.Sin(cargo.AngleRad));
+        basePos += ring.transform.position;
         
-        lineRenderer.SetPosition(0, startPos);
+        lineRenderer.SetPosition(0, basePos);
         lineRenderer.SetPosition(1, cargo.transform.position);
     }
     
@@ -310,53 +291,52 @@ public class PlatformGround : MonoBehaviour
         lineRenderer.SetPosition(1, endPos);
     }
 
-    private void DrawLines()
+    private void PutAngles()
     {
-        ClearLines();
-        for (var i = 0; i < _cargos.Count; i++)
+        foreach (Transform child in anglePrefabHolder.transform)
         {
-            var cargo = _cargos[i];
-            var cargoData = _levelData.CargoDatas[i];
-            
-            // Костыль для работы AR
-            var centerPos = _ringPhysicsPosition;
-
-            // var newAngle = Mathf.Atan2(cargo.CargoMediator.Position.y - centerPos.y,
-            //     cargo.CargoMediator.Position.x - centerPos.x) * Mathf.Rad2Deg;
-            // if (newAngle < 0)
-            // {
-            //     newAngle += 360;
-            // }
-            //
-            // cargo.gameObject.transform.rotation = Quaternion.Euler(0, 90 - newAngle, 0);
-            
-            //var targetAngle = cargoData.Angle + angleDelta / 2;
-            //var targetAngleRad = targetAngle * Mathf.Deg2Rad;
-            var targetAngle = _cargos[i].Angle;
-            var targetAngleRad = _cargos[i].CargoMediator.AngleRad;
+            Destroy(child.gameObject);
+        }
+        
+        foreach (var cargo in _cargos)
+        {
+            var targetAngle = cargo.Angle;
+            var targetAngleRad = cargo.CargoMediator.AngleRad;
             
             var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
 
-            var angle = targetAngle;
-            if (targetAngle >= 315 || targetAngle <= 135)
-                 angle += 180;
+            var angle = 90 - targetAngle;
+            if (angle < 0)
+                angle += 360;
+
+            if (angle > 360)
+                angle -= 360;
             
             var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, angle, 0),
                 anglePrefabHolder.transform);
             angleObj.transform.position += anglePrefabHolder.transform.position;
 
             angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle) + "°";
-            // var circle = angleObj.AddComponent<Circle>();
-            // circle.segments = 32;
-            // circle.xradius = 2f;
-            // circle.yradius = 2f;
+        }
+    }
 
+    private void DrawLines()
+    {
+        ClearLines();
+        foreach (var cargo in _cargos)
+        {
             DrawLineToMediator(cargo.CargoMediator);
             DrawLineToCargo(cargo);
         }
     }
-    
+
+    private void CalculateGameState()
+    {
+        CalcPlatformAngle();
+        PutAngles();
+        DrawLines();
+    }
 
     public void AddCargoMass(int value)
     {
@@ -365,16 +345,13 @@ public class PlatformGround : MonoBehaviour
         
         _cargosLeft--;
         _cargos[_levelData.UnknownCargoId].AdjustCargoMass(value);
-        
-        CalcPlatformAngle();
-        DrawLines();
+        CalculateGameState();
     }
 
     private void Rotate(float delta)
     {
         _cargos[_levelData.UnknownCargoId].Rotate(delta, cargosMediatorHolder, cargosHolder);
-        CalcPlatformAngle();
-        DrawLines();
+        CalculateGameState();
     }
 
     public void RotateLeft()
