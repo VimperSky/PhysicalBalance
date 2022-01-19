@@ -82,7 +82,7 @@ public class LevelDataKeeper : MonoBehaviour
             {
                 new() { Angle = 0, Mass = 6 },
                 new() { Angle = 95, Mass = 1 },
-                new() { Angle = 100, Mass = 0 }
+                new() { Angle = 125, Mass = 0 }
             },
             CargoChoosingMasses = new () {1, 2, 3, 5},
             // Solution: 5

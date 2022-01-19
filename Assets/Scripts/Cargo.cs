@@ -54,6 +54,11 @@ public class Cargo: MonoBehaviour
     public void Rotate(float rotationDelta, GameObject cargosMediatorHolder, GameObject cargosHolder)
     {
         Angle += rotationDelta;
+        if (Angle > 360)
+            Angle -= 360;
+
+        if (Angle < 0)
+            Angle += 360;
         
         var angleRad = Angle * Mathf.Deg2Rad;
         var cargoBasePos = new Vector3( PlaceRadius * Mathf.Cos(angleRad), 0f, PlaceRadius * Mathf.Sin(angleRad));

@@ -213,18 +213,19 @@ public class PlatformGround : MonoBehaviour
         formulaY += $") / {sumMass}";
 
         formula.text = formulaX + "\n" + formulaY;
-        
+
+        resultForcePhys /= sumMass;
         resultForce /= sumMass;
         resultForce /= 30f;
 
         
-        var resultAngle = Mathf.Atan2(resultForce.x , resultForce.y) * Mathf.Rad2Deg;
+        var resultAngle = Mathf.Atan2(resultForcePhys.y , resultForcePhys.x) * Mathf.Rad2Deg;
         if (resultAngle < 0)
             resultAngle += 360;
         if (IsPlatformInBalance(resultForce))
             SetAngleValueText("0");
         else
-            SetAngleValueText(resultAngle.ToString("0.0"));
+            SetAngleValueText(resultAngle.ToString("0"));
 
         // * 5f это костыль для AR, по-другому хз как сделать.
         _ringPhysicsPosition = new Vector2(_ringStartPhysicsPosition.x + resultForce.x, _ringStartPhysicsPosition.y + resultForce.y);
@@ -334,12 +335,18 @@ public class PlatformGround : MonoBehaviour
             
             var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
-            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180  - targetAngle, 0),
-                anglePrefabHolder.transform);
-            var position = angleObj.transform.position;
-            position += anglePrefabHolder.transform.position;
-            angleObj.transform.position = position;
+            startPos += ring.transform.position;
+
+            var angle = - targetAngle;
+            Debug.Log("Written angle: " + targetAngle);
+            Debug.Log("Text angle: " + angle);
+            Debug.Log("end");
+            if (targetAngle >= 315 || targetAngle <= 135)
+                 angle += 180;
             
+            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, angle, 0),
+                anglePrefabHolder.transform);
+
             angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle) + "°";
             // var circle = angleObj.AddComponent<Circle>();
             // circle.segments = 32;
