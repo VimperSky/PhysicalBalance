@@ -20,7 +20,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
-    private const float AngleDrawRadius = 2.5f;
+    private const float AngleDrawRadius = 5.25f;
     private const float AxisDrawRadius = 4.75f;
 
     private readonly List<Cargo> _cargos = new();
@@ -205,18 +205,20 @@ public class PlatformGround : MonoBehaviour
         }
         
         var sumMass = _cargos.Sum(cargo => cargo.TotalMass);
+     
         
-        //formulaX += $") / {sumMass} = {resultForcePhys.x:0.00}";
-        //formulaY += $") / {sumMass}= {resultForcePhys.y:0.00}";
-        
-        formulaX += $") / {sumMass}";
-        formulaY += $") / {sumMass}";
-
-        formula.text = formulaX + "\n" + formulaY;
-
         resultForcePhys /= sumMass;
         resultForce /= sumMass;
         resultForce /= 30f;
+
+
+        formulaX += $") / {sumMass} = {resultForcePhys.x:0.00}";
+        formulaY += $") / {sumMass}= {resultForcePhys.y:0.00}";
+
+        if (_levelData.IsRotationAvailable)
+        {
+            formula.text = formulaX + "\n" + formulaY;
+        }
 
         
         var resultAngle = Mathf.Atan2(resultForcePhys.y , resultForcePhys.x) * Mathf.Rad2Deg;
@@ -282,7 +284,7 @@ public class PlatformGround : MonoBehaviour
         lineObj.transform.SetParent(linesHolder.transform);
         var lineRenderer = lineObj.GetComponent<LineRenderer>();
         
-        lineRenderer.widthMultiplier = 0.05f;
+        lineRenderer.widthMultiplier = 0.04f;
         lineRenderer.material = lineMaterial;
         
         var startPos = new Vector3(RingRadius * Mathf.Cos(cargo.AngleRad), 0f, RingRadius * Mathf.Sin(cargo.AngleRad));
@@ -298,7 +300,7 @@ public class PlatformGround : MonoBehaviour
         lineObj.transform.SetParent(linesHolder.transform);
         var lineRenderer = lineObj.GetComponent<LineRenderer>();
         
-        lineRenderer.widthMultiplier = 0.05f;
+        lineRenderer.widthMultiplier = 0.04f;
         lineRenderer.material = lineMaterial;
         
         var startPos = cargo.transform.position;
@@ -335,17 +337,14 @@ public class PlatformGround : MonoBehaviour
             
             var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
-            startPos += ring.transform.position;
 
-            var angle = - targetAngle;
-            Debug.Log("Written angle: " + targetAngle);
-            Debug.Log("Text angle: " + angle);
-            Debug.Log("end");
+            var angle = targetAngle;
             if (targetAngle >= 315 || targetAngle <= 135)
                  angle += 180;
             
             var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, angle, 0),
                 anglePrefabHolder.transform);
+            angleObj.transform.position += anglePrefabHolder.transform.position;
 
             angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle) + "°";
             // var circle = angleObj.AddComponent<Circle>();
