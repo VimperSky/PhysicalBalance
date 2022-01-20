@@ -19,8 +19,8 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject axisLinesHolder;
     [SerializeField] private GameObject ring;
     
-    private const float RingRadius = 1.15f;
-    private const float AngleDrawRadius = 4.9f;
+    private const float RingRadius = 0.92f;
+    private const float AngleDrawRadius = 2.5f;
     private const float AxisDrawRadius = 4.75f;
 
     private readonly List<Cargo> _cargos = new();
@@ -304,7 +304,7 @@ public class PlatformGround : MonoBehaviour
         lineRenderer.SetPosition(0, startPos);
         lineRenderer.SetPosition(1, endPos);
     }
-
+    
     private void PutAngles()
     {
         foreach (Transform child in anglePrefabHolder.transform)
@@ -317,11 +317,17 @@ public class PlatformGround : MonoBehaviour
             var cargo = _cargos[index];
             var targetAngle = cargo.Angle;
             var targetAngleRad = cargo.CargoMediator.AngleRad;
-
+            
             var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
+            //startPos += ring.transform.position;
+            startPos += cargosMediatorHolder.transform.position;
+            
 
-            var angle = 90 - targetAngle;
+            var angle = -targetAngle;
+            if (targetAngle >= 315 || targetAngle <= 135)
+                angle += 180;
+            
             if (angle < 0)
                 angle += 360;
 
@@ -330,7 +336,6 @@ public class PlatformGround : MonoBehaviour
 
             var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, angle, 0),
                 anglePrefabHolder.transform);
-            angleObj.transform.position += anglePrefabHolder.transform.position;
 
             angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle) + "°";
             if (index == _levelData.UnknownCargoId && _levelData.IsRotationAvailable)
