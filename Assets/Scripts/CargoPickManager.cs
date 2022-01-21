@@ -21,6 +21,8 @@ public class CargoPickManager: MonoBehaviour
     [SerializeField] private Button leftRotation;
     [SerializeField] private Button rightRotation;
 
+    private readonly List<Button> _animatedButtons = new();
+
     private int _cargoId;
     
     private void Start()
@@ -67,7 +69,8 @@ public class CargoPickManager: MonoBehaviour
     
     private void AddCargoMass(Button cargoPick, int mass)
     {
-        StartCoroutine(ChangeColor(cargoPick));
+        if (!_animatedButtons.Contains(cargoPick))
+            StartCoroutine(ChangeColor(cargoPick));
         //cargoPick.gameObject.SetActive(false);
         platformGround.AddCargoMass(mass);
         MusicProvider.Instance.PlayClick();
@@ -79,22 +82,29 @@ public class CargoPickManager: MonoBehaviour
         var defaultColor = text.color;
         text.color = Color.green;
 
-        yield return new WaitForSeconds(1);
+        _animatedButtons.Add(cargoPick);
+        yield return new WaitForSeconds(1f);
         
         text.color = defaultColor;
+        _animatedButtons.Remove(cargoPick);
     }
     
     
     public void TargetFound()
     {
         gameObject.SetActive(true);
-        leftRotation.gameObject.SetActive(true);
-        rightRotation.gameObject.SetActive(true);
+
+        if (LevelDataKeeper.Instance.LevelData.IsRotationAvailable)
+        {
+            leftRotation.gameObject.SetActive(true);
+            rightRotation.gameObject.SetActive(true);
+        }
     }
 
     public void TargetLost()
     {
         gameObject.SetActive(false);
+        
         leftRotation.gameObject.SetActive(false);
         rightRotation.gameObject.SetActive(false);
     }
