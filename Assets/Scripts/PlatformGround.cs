@@ -1,5 +1,5 @@
-using System;
-using System.Collections.Generic;
+    using System;
+    using System.Collections.Generic;
 using System.Linq;
 using Data;
 using TMPro;
@@ -20,8 +20,8 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
-    private const float AngleDrawRadius = 4.9f;
-    private const float AxisDrawRadius = 4.75f;
+    private const float AngleDrawRadius = 5f;
+    private const float AxisDrawRadius = 5.05f;
 
     private readonly List<Cargo> _cargos = new();
     
@@ -49,6 +49,8 @@ public class PlatformGround : MonoBehaviour
 
     [SerializeField] private Material lineMaterial;
 
+    private float _resultAngle;
+    
     private void SetAngleValueText(string value)
     {
         hud.transform.Find("AngleValue").GetComponent<TextMeshProUGUI>().text = value;
@@ -116,7 +118,7 @@ public class PlatformGround : MonoBehaviour
             lineObj.transform.position += linesHolder.transform.position;
             var lineRenderer = lineObj.GetComponent<LineRenderer>();
         
-            lineRenderer.widthMultiplier = 0.01f;
+            lineRenderer.widthMultiplier = 0.02f;
             lineRenderer.SetPosition(0, GetAnglePos(angle0));
             lineRenderer.SetPosition(1, GetAnglePos(angle1));
         }
@@ -226,10 +228,17 @@ public class PlatformGround : MonoBehaviour
         var resultAngle = Mathf.Atan2(resultForcePhys.y , resultForcePhys.x) * Mathf.Rad2Deg;
         if (resultAngle < 0)
             resultAngle += 360;
-        if (IsPlatformInBalance(resultForce))
-            SetAngleValueText("0");
-        else
-            SetAngleValueText(resultAngle.ToString("0"));
+
+        _resultAngle = resultAngle;
+
+        // foreach (var angleData in _angleDatas)
+        // {
+        //     if (resultAngle >= angleData.StartAngle && resultAngle <= angleData.EndAngle)
+        //     {
+        //         SetAngleValueText(angleData.Value.ToString("0"));
+        //         break;
+        //     }
+        // }
 
         ring.transform.localPosition = new Vector3(_ringStartPosition.x + resultForce.x, _ringStartPosition.y, _ringStartPosition.z + resultForce.y);
         
@@ -304,37 +313,46 @@ public class PlatformGround : MonoBehaviour
         lineRenderer.SetPosition(0, startPos);
         lineRenderer.SetPosition(1, endPos);
     }
-
+    
     private void PutAngles()
     {
         foreach (Transform child in anglePrefabHolder.transform)
         {
             Destroy(child.gameObject);
         }
+        
 
-        for (var index = 0; index < _cargos.Count; index++)
+        var sortedCargos = _cargos.OrderBy(x => x.Angle).ToList();
+        for (var i = 0; i < sortedCargos.Count; i++)
         {
-            var cargo = _cargos[index];
-            var targetAngle = cargo.Angle;
-            var targetAngleRad = cargo.CargoMediator.AngleRad;
+            var cargo = sortedCargos[i];
+            
+            var prevAngleId = i == 0 ? sortedCargos.Count - 1 : i - 1;
+            var prevAngle = sortedCargos[prevAngleId].Angle;
+            
+            var angleDelta = MathExt.Mod(cargo.Angle - prevAngle, 360);
+            var anglePosition = MathExt.Mod(prevAngle + angleDelta / 2, 360);
 
+            var posibleAngles = Enumerable.Range((int)prevAngle, (int)angleDelta);
+            var findingAngle = (int)_resultAngle;
+            if (posibleAngles.Contains(findingAngle))
+                SetAngleValueText(angleDelta.ToString("0"));
+            
+            if (angleDelta == 0)
+                continue;
+
+            var targetAngleRad = anglePosition * Mathf.Deg2Rad;
+            
             var startPos = new Vector3(AngleDrawRadius * Mathf.Cos(targetAngleRad), 0f,
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
-
-            var angle = 90 - targetAngle;
-            if (angle < 0)
-                angle += 360;
-
-            if (angle > 360)
-                angle -= 360;
-
-            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, angle, 0),
+            var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180 - 90 - anglePosition, 0),
                 anglePrefabHolder.transform);
             angleObj.transform.position += anglePrefabHolder.transform.position;
+            
 
-            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = Mathf.Abs(targetAngle) + "°";
-            if (index == _levelData.UnknownCargoId && _levelData.IsRotationAvailable)
-                angleObj.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
+            angleObj.GetComponentInChildren<TextMeshProUGUI>().text = angleDelta.ToString("0") + "°";
+            // if (i == _levelData.UnknownCargoId && _levelData.IsRotationAvailable)
+            //     angleObj.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
         }
     }
 
