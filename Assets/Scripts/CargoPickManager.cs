@@ -17,43 +17,19 @@ public class CargoPickManager: MonoBehaviour
     [SerializeField] private GameObject cargoPrefab;
 
     [SerializeField] private PlatformGround platformGround;
-
-    [SerializeField] private Button leftRotation;
-    [SerializeField] private Button rightRotation;
-
+    
     private readonly List<Button> _animatedButtons = new();
 
     private int _cargoId;
     
-    private void Start()
+    private void Awake()
     {
         var levelData = LevelDataKeeper.Instance.LevelData;
-
-        if (levelData.IsRotationAvailable)
-        {
-            leftRotation.gameObject.SetActive(true);
-            rightRotation.gameObject.SetActive(true);
-        }
         
         InitCargoPick(cargoPick1, levelData.CargoChoosingMasses[0]);
         InitCargoPick(cargoPick2, levelData.CargoChoosingMasses[1]);
         InitCargoPick(cargoPick3, levelData.CargoChoosingMasses[2]);
         InitCargoPick(cargoPick4, levelData.CargoChoosingMasses[3]);
-        
-        leftRotation.onClick.AddListener(OnLeftRotate);
-        rightRotation.onClick.AddListener(OnRightRotate);
-
-        gameObject.SetActive(MenuConfig.Instance.IsDebug);
-    }
-
-    private void OnLeftRotate()
-    {
-        platformGround.RotateLeft();
-    }
-    
-    private void OnRightRotate()
-    {
-        platformGround.RotateRight();
     }
     
     private void InitCargoPick(Button cargoPick, int value)
@@ -87,25 +63,5 @@ public class CargoPickManager: MonoBehaviour
         
         text.color = defaultColor;
         _animatedButtons.Remove(cargoPick);
-    }
-    
-    
-    public void TargetFound()
-    {
-        gameObject.SetActive(true);
-
-        if (LevelDataKeeper.Instance.LevelData.IsRotationAvailable)
-        {
-            leftRotation.gameObject.SetActive(true);
-            rightRotation.gameObject.SetActive(true);
-        }
-    }
-
-    public void TargetLost()
-    {
-        gameObject.SetActive(false);
-        
-        leftRotation.gameObject.SetActive(false);
-        rightRotation.gameObject.SetActive(false);
     }
 }

@@ -1,5 +1,4 @@
-    using System;
-    using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Data;
 using TMPro;
@@ -28,7 +27,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject winTextPrefab;
     [SerializeField] private GameObject loseTextPrefab;
 
-    [SerializeField] private GameObject cargoPickPanel;
+    [SerializeField] private GameUiController gameUiController;
 
     [SerializeField] private Transform canvasTransform;
 
@@ -230,15 +229,7 @@ public class PlatformGround : MonoBehaviour
             resultAngle += 360;
 
         _resultAngle = resultAngle;
-
-        // foreach (var angleData in _angleDatas)
-        // {
-        //     if (resultAngle >= angleData.StartAngle && resultAngle <= angleData.EndAngle)
-        //     {
-        //         SetAngleValueText(angleData.Value.ToString("0"));
-        //         break;
-        //     }
-        // }
+        
 
         ring.transform.localPosition = new Vector3(_ringStartPosition.x + resultForce.x, _ringStartPosition.y, _ringStartPosition.z + resultForce.y);
         
@@ -254,7 +245,8 @@ public class PlatformGround : MonoBehaviour
             
             GameObject.Find("Home").SetActive(false);
             
-            cargoPickPanel.SetActive(false);
+            gameUiController.Victory();
+            
             
             if (_levelData.IsFinalLevel)
                 GameObject.Find("Next").SetActive(false);
@@ -268,7 +260,7 @@ public class PlatformGround : MonoBehaviour
 
             GameObject.Find("Home").SetActive(false);
 
-            cargoPickPanel.SetActive(false);
+            gameUiController.Defeat();
         }
     }
     
