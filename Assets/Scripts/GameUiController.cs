@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -16,6 +17,10 @@ public class GameUiController: MonoBehaviour
     [SerializeField] private GameObject hideBack;
 
     [SerializeField] private GameObject angle;
+
+    [SerializeField] private GameObject angleRotationPanel;
+
+    
     private void Awake()
     {
         homeButton.onClick.AddListener(() =>
@@ -42,7 +47,7 @@ public class GameUiController: MonoBehaviour
         leftRotation.gameObject.SetActive(MenuConfig.Instance.IsDebug && LevelDataKeeper.Instance.LevelData.IsRotationAvailable);
         rightRotation.gameObject.SetActive(MenuConfig.Instance.IsDebug && LevelDataKeeper.Instance.LevelData.IsRotationAvailable);
 
-        targetInfo.gameObject.SetActive(!MenuConfig.Instance.IsDebug);
+        //targetInfo.gameObject.SetActive(!MenuConfig.Instance.IsDebug);
     }
 
     private void OnLeftRotate()
@@ -73,14 +78,25 @@ public class GameUiController: MonoBehaviour
     {
         GameEnd();
     }
+
+    private IEnumerator YouCanRotate()
+    {
+        angleRotationPanel.SetActive(true);
+
+        yield return new WaitForSeconds(5);
+        
+        angleRotationPanel.SetActive(false);
+    }
     
     
     public void TargetFound()
     {
-        targetInfo.gameObject.SetActive(false);
+        //targetInfo.gameObject.SetActive(false);
         cargoPickManager.gameObject.SetActive(true);
         if (LevelDataKeeper.Instance.LevelData.IsRotationAvailable)
         {
+            StartCoroutine(YouCanRotate());
+            
             leftRotation.gameObject.SetActive(true);
             rightRotation.gameObject.SetActive(true);
         }
@@ -88,7 +104,7 @@ public class GameUiController: MonoBehaviour
 
     public void TargetLost()
     {
-        targetInfo.gameObject.SetActive(true);
+        //targetInfo.gameObject.SetActive(true);
         cargoPickManager.gameObject.SetActive(false);
         leftRotation.gameObject.SetActive(false);
         rightRotation.gameObject.SetActive(false);
