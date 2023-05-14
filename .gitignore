@@ -49,6 +49,8 @@ ExportedObj/
 .idea
 
 Packages/com.ptc.vuforia.engine-10.3.2.tgz
+Packages/com.ptc.vuforia.engine-10.15.4.tgz
+
 
 # Unity3D generated meta files
 *.pidb.meta

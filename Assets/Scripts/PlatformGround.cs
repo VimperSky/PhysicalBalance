@@ -19,7 +19,7 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private GameObject ring;
     
     private const float RingRadius = 1.15f;
-    private const float AngleDrawRadius = 5f;
+    private const float AngleDrawRadius = 1.15f;
     private const float AxisDrawRadius = 5.05f;
 
     private readonly List<Cargo> _cargos = new();
@@ -313,7 +313,6 @@ public class PlatformGround : MonoBehaviour
             Destroy(child.gameObject);
         }
         
-
         var sortedCargos = _cargos.OrderBy(x => x.Angle).ToList();
         for (var i = 0; i < sortedCargos.Count; i++)
         {
@@ -339,9 +338,9 @@ public class PlatformGround : MonoBehaviour
                 AngleDrawRadius * Mathf.Sin(targetAngleRad));
             var angleObj = Instantiate(anglePrefab, startPos, Quaternion.Euler(0, 180 - 90 - anglePosition, 0),
                 anglePrefabHolder.transform);
-            angleObj.transform.position += anglePrefabHolder.transform.position;
+            angleObj.transform.position += ring.transform.position;
+            //angleObj.transform.position += anglePrefabHolder.transform.position;
             
-
             angleObj.GetComponentInChildren<TextMeshProUGUI>().text = angleDelta.ToString("0") + "°";
             // if (i == _levelData.UnknownCargoId && _levelData.IsRotationAvailable)
             //     angleObj.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
