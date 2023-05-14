@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class Cargo: MonoBehaviour
@@ -47,10 +49,16 @@ public class Cargo: MonoBehaviour
         {
             AddCargoMass(mass);
         }
-        
+
+        SetDisplayedValue(_totalMass, _totalMass == 0);
         CargoMediator.SetDisplayedValue(_totalMass, _totalMass == 0);
     }
 
+    private void SetDisplayedValue(float value, bool isUnknown)
+    {
+        transform.Find("Canvas").Find("TextMass").gameObject.GetComponent<TextMeshProUGUI>().text = !isUnknown ? value.ToString(CultureInfo.InvariantCulture) + " кг" : "?";
+    }
+    
     public void Rotate(float rotationDelta, GameObject cargosMediatorHolder, GameObject cargosHolder)
     {
         Angle += rotationDelta;
@@ -82,18 +90,19 @@ public class Cargo: MonoBehaviour
     private void AddCargoMass(int cargoMassValue)
     {
         var newObj = Instantiate(Resources.Load($"Prefabs/CargoMass/{cargoMassValue}"), transform) as GameObject;
+
         var newPosition = new Vector3(0f,  _lastMassY + newObj.transform.localScale.y / 50f, 0f);
         newObj.transform.localPosition = newPosition;
         _lastMassY = newObj.transform.localPosition.y + newObj.transform.localScale.y / 50f;
         _totalMass += cargoMassValue;
+        
+        //newObj.GetComponent<Animator>().CrossFade("CargoPlaceVal", 0.0f);
     }
 
     public void SetColor(Color color)
     {
         CargoMediator.SetColor(color);
     }
-
-    
 
     public Vector2 Force => CargoMediator.Position * _totalMass;
 

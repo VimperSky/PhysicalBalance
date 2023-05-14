@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Globalization;
+using TMPro;
 using UnityEngine;
 
 public class CargoMediator: MonoBehaviour
@@ -18,6 +19,6 @@ public class CargoMediator: MonoBehaviour
 
     public void SetDisplayedValue(float value, bool isUnknown)
     {
-        transform.Find("Canvas").Find("TextMass").gameObject.GetComponent<TextMeshProUGUI>().text = !isUnknown ? value.ToString() : "?";
+        transform.Find("Canvas").Find("TextMass").gameObject.GetComponent<TextMeshProUGUI>().text = !isUnknown ? value.ToString(CultureInfo.InvariantCulture) + " кг" : "?";
     }
 }

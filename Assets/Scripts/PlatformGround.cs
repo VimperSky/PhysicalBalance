@@ -49,6 +49,8 @@ public class PlatformGround : MonoBehaviour
     [SerializeField] private Material lineMaterial;
 
     private float _resultAngle;
+
+    private bool _init = true;
     
     private void SetAngleValueText(string value)
     {
@@ -229,8 +231,15 @@ public class PlatformGround : MonoBehaviour
             resultAngle += 360;
 
         _resultAngle = resultAngle;
-        
 
+        if (_init)
+        {
+            _init = false;
+        }
+        else
+        {
+            ring.GetComponent<Animator>().CrossFade("RingMoving", 0.0f);
+        }
         ring.transform.localPosition = new Vector3(_ringStartPosition.x + resultForce.x, _ringStartPosition.y, _ringStartPosition.z + resultForce.y);
         
         if (_gameState != GameState.Started) 
